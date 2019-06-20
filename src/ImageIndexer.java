@@ -214,5 +214,5 @@ public class ImageIndexer {
 //		indexer.indexHtmlFile("input/index.html");
 //		indexer.indexSpecialFile("input/sogou-utf8.xml");
 //		indexer.saveGlobals("forIndex/global.txt");
-	}
+	}a
 }
