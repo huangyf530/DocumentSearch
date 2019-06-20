@@ -6,6 +6,7 @@ import java.util.*;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.search.similarities.BM25Similarity;
+
 import org.w3c.dom.*;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 import org.apache.lucene.analysis.Analyzer;
@@ -17,7 +18,18 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
-import javax.xml.parsers.*; 
+import javax.xml.parsers.*;
+
+import java.io.FileInputStream;
+
+import org.apache.poi.hwpf.extractor.WordExtractor;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.io.RandomAccessFile;
+import org.apache.pdfbox.text.PDFTextStripper;
+
 
 public class ImageIndexer {
 	private Analyzer analyzer; 
@@ -93,8 +105,29 @@ public class ImageIndexer {
 	 * pdffile
 	 *
 	 */
-	public void indexPdfFile(String filename){
+	public void indexPdfFile(String filename)
+	{
+		String ans;
+		try {
+			File file = new File(filename);
 
+			PDFParser pdfParser = new PDFParser(new RandomAccessFile(file, "r"));
+			pdfParser.parse();
+			PDDocument pdDocument = pdfParser.getPDDocument();
+			ans = new PDFTextStripper().getText(pdDocument);
+			pdDocument.close();
+		}
+		catch(FileNotFoundException e)
+		{
+			System.out.println("file error");
+			ans = "file not found.";
+		}
+		catch(IOException e)
+		{
+			ans = "file open error.";
+		}
+
+		System.out.println(delCharSymbol(ans));
 	}
 
 	/**
@@ -102,12 +135,58 @@ public class ImageIndexer {
 	 * docxfile
 	 *
 	 */
-	public void indexdocxFile(String filename){
+	public void indexdocxFile(String filename) {
+		String ans;
 
+		try{
+			InputStream is = new FileInputStream(filename);
+
+			if(filename.endsWith(".doc") || filename.endsWith(".DOC"))
+			{
+				WordExtractor extractor;
+				extractor = new WordExtractor(is);
+				ans = extractor.getText();
+			}
+			else if(filename.endsWith(".docx") || filename.endsWith(".DOCX"))
+			{
+				XWPFDocument doc = new XWPFDocument(is);
+				XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
+				ans = extractor.getText();
+			}
+			else
+			{
+				ans = "file name error.";
+			}
+		}
+		catch(FileNotFoundException e)
+		{
+			System.out.println("file error");
+			ans = "file not found.";
+		}
+		catch(IOException e)
+		{
+			ans = "file open error.";
+		}
+
+		System.out.println(delCharSymbol(ans));
 	}
+
+	public String delCharSymbol(String str)
+	{
+		String temp = str.replace('\t',' ');
+		temp = temp.replaceAll("\n|\r","");
+		return temp;
+	}
+
 	public static void main(String[] args) {
 		ImageIndexer indexer=new ImageIndexer("forIndex/index");
-		indexer.indexSpecialFile("input/sogou-utf8.xml");
-//		indexer.saveGlobals("forIndex/global.txt");
+		//indexer.indexSpecialFile("input/sogou-utf8.xml");
+		//indexer.saveGlobals("forIndex/global.txt");
+
+
+		//indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc");
+		//indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx");
+		//indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf");
+
 	}
 }

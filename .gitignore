@@ -5,3 +5,4 @@ ImageSearch.iml
 out/
 *.jar
 input/*
+*.iml
