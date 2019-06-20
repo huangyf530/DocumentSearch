@@ -3,7 +3,7 @@ import java.nio.file.Paths;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
-import org.wltea.analyzer.lucene.IKAnalyzer;
+import CNAnalyzer.*;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -22,7 +22,7 @@ public class ImageIndexer {
     private double averageLength=1.0f;
     
     public ImageIndexer(String indexDir){
-    	analyzer = new StandardAnalyzer();
+    	analyzer = new IKAnalyzer4Lucene7();
     	try{
     		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
     		iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
