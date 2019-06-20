@@ -87,9 +87,27 @@ public class ImageIndexer {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * <p>
+	 * pdffile
+	 *
+	 */
+	public void indexPdfFile(String filename){
+
+	}
+
+	/**
+	 * <p>
+	 * docxfile
+	 *
+	 */
+	public void indexdocxFile(String filename){
+
+	}
 	public static void main(String[] args) {
 		ImageIndexer indexer=new ImageIndexer("forIndex/index");
 		indexer.indexSpecialFile("input/sogou-utf8.xml");
-		indexer.saveGlobals("forIndex/global.txt");
+//		indexer.saveGlobals("forIndex/global.txt");
 	}
 }
