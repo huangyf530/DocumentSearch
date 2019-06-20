@@ -1,0 +1,7 @@
+.idea/
+.settings/
+ImageSearch.iml
+*.DS_Store
+out/
+*.jar
+input/*
