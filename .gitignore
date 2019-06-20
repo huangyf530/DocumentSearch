@@ -1,8 +1,9 @@
 .idea/
 .settings/
-ImageSearch.iml
+*.iml
 *.DS_Store
 out/
 *.jar
 input/*
 *.iml
+forIndex/index/*
