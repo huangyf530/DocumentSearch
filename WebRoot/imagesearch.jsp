@@ -16,36 +16,95 @@ System.out.println(basePath);
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>搜索</title>
 <style type="text/css">
-<!--
-#Layer1 {
-	position:absolute;
-	left:489px;
-	top:326px;
-	width:404px;
-	height:29px;
-	z-index:1;
+*{
+  margin: 0;
+  padding: 0;
 }
-#Layer2 {
-	position:absolute;
-	left:480px;
-	top:68px;
-	width:446px;
-	height:152px;
-	z-index:2;
-}
--->
+  .wrapper{
+    position: fixed;
+    left: 50%;
+    top: 30%;
+    width: 500px;
+    height: 250px;
+    margin-left: -250px;
+    margin-top: -30px;
+  }
+
+  .copyright{
+    position: fixed;
+    left: 50%;
+    top: 100%;
+    width: 500px;
+    height: 30px;
+    margin-left: -250px;
+    margin-top: -30px;
+    color: gray;
+  }
+
+
+
+  .searchbox{
+    height: 30px;
+    width: 460px;
+    font-size:17px;
+    margin-top: 220px;
+    background-image: url(pic/sousuo.png);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    padding:0 0 0 30px;
+
+  }
+
+  .searchbutton{
+    -webkit-appearance : none;
+    height: 40px;
+    width: 100px;
+    border-width: 0px; /* 边框宽度 */
+    border-radius: 3px; /* 边框半径 */
+    background: #F03D33; /* 背景颜色 */
+    cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+    outline: none; /* 不显示轮廓线 */
+    color: white; /* 字体颜色 */
+    font-size: 17px; /* 字体大小 */
+  }
+
+  .hyfpic{
+    position: absolute;
+    margin-left: 100px;
+    margin-top: 0px;
+    width: 300px;
+    height: 200px;
+  }
+
+
+
+
 </style>
 </head>
-<body>
-<div id="Layer1" style="top: 210px; left: 353px; width: 441px;">
+<body style="text-align:center">
+
+
+<div id="Layer1" class="wrapper">
+
+  <div id="Layer0" class="hyfpic">
+    <img src="/pic/logo.jpg" style="height: 200px; width: 300px;"/>
+  </div>
+
   <form id="form1" name="form1" method="get" action="servlet/ImageServer">
     <label>
-      <input name="query" type="text" size="50" />
+      <input name="query" type="text" class="searchbox" placeholder="请输入要查询的关键字"/>
     </label>
+    <br/>
+    <br/>
     <label>
-    <input type="submit" name="Submit" value="搜索" />
+    <input type="submit" name="Submit" class="searchbutton" value="搜索" />
     </label>
   </form>
 </div>
+
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf, Gengw, Jiangdj. All Rights Reserved.</div>
+
+
+
 </body>
 </html>

@@ -175,10 +175,12 @@ public class ImageIndexer {
 		try {
 			File file = new File(filename);
 
+
 //			PDFParser pdfParser = new PDFParser(new RandomAccessFile(file, "r"));
 //			pdfParser.parse();
 //			PDDocument pdDocument = pdfParser.getPDDocument();
 			PDDocument pdDocument = PDDocument.load(file);
+
 			String all = new PDFTextStripper().getText(pdDocument);
 			pdDocument.close();
 			all = all.trim();
