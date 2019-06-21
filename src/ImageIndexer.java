@@ -133,27 +133,52 @@ public class ImageIndexer {
 	 */
 	public void indexPdfFile(String filename, String url)
 	{
-		String ans;
+		String title;
+		String content;
 		try {
 			File file = new File(filename);
 
 			PDFParser pdfParser = new PDFParser(new RandomAccessFile(file, "r"));
 			pdfParser.parse();
 			PDDocument pdDocument = pdfParser.getPDDocument();
-			ans = new PDFTextStripper().getText(pdDocument);
+			String all = new PDFTextStripper().getText(pdDocument);
 			pdDocument.close();
+			all = all.trim();
+			int breakpoint = all.indexOf("\n");
+
+			while(breakpoint==0)
+			{
+				all = all.substring(1);
+				all = all.trim();
+				breakpoint = all.indexOf("\n");
+			}
+
+			if(breakpoint < 0)
+			{
+				title = "";
+				content = all;
+			}
+			else {
+				title = all.substring(0, breakpoint);
+				content = all.substring(breakpoint + 1);
+			}
 		}
 		catch(FileNotFoundException e)
 		{
-			System.out.println("file error");
-			ans = "file not found.";
+			title = "file not found.";
+			content = "file not found.";
 		}
 		catch(IOException e)
 		{
-			ans = "file open error.";
+			title = "file open error.";
+			content = "file open error.";
 		}
 
-		System.out.println(delCharSymbol(ans));
+		title = delCharSymbol(title);
+		content = delCharSymbol(content);
+
+		System.out.println(title);
+		System.out.println(content);
 	}
 
 	/**
@@ -162,39 +187,65 @@ public class ImageIndexer {
 	 *
 	 */
 	public void indexdocxFile(String filename, String url) {
-		String ans;
+		String title;
+		String content;
 
 		try{
 			InputStream is = new FileInputStream(filename);
+			String all;
 
 			if(filename.endsWith(".doc") || filename.endsWith(".DOC"))
 			{
 				WordExtractor extractor;
 				extractor = new WordExtractor(is);
-				ans = extractor.getText();
+				all = extractor.getText();
 			}
 			else if(filename.endsWith(".docx") || filename.endsWith(".DOCX"))
 			{
 				XWPFDocument doc = new XWPFDocument(is);
 				XWPFWordExtractor extractor = new XWPFWordExtractor(doc);
-				ans = extractor.getText();
+				all = extractor.getText();
 			}
 			else
 			{
-				ans = "file name error.";
+				all = "file type error.";
+			}
+
+			all = all.trim();
+			int breakpoint = all.indexOf("\n");
+			while(breakpoint==0)
+			{
+				all = all.substring(1);
+				all = all.trim();
+				breakpoint = all.indexOf("\n");
+			}
+
+			if(breakpoint < 0)
+			{
+				title = "";
+				content = all;
+			}
+			else {
+				title = all.substring(0, breakpoint);
+				content = all.substring(breakpoint + 1);
 			}
 		}
 		catch(FileNotFoundException e)
 		{
-			System.out.println("file error");
-			ans = "file not found.";
+			title = "file not found.";
+			content = "file not found.";
 		}
 		catch(IOException e)
 		{
-			ans = "file open error.";
+			title = "file open error.";
+			content = "file open error.";
 		}
 
-		System.out.println(delCharSymbol(ans));
+		title = delCharSymbol(title);
+		content = delCharSymbol(content);
+
+		System.out.println(title);
+		System.out.println(content);
 	}
 
 	private String delCharSymbol(String str)
@@ -263,9 +314,9 @@ public class ImageIndexer {
 		//indexer.saveGlobals("forIndex/global.txt");
 
 
-		//indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc");
-		//indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx");
-		//indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf");
+		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
+		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
+		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
 //		indexer.indexHtmlFile("input/index.html");
 //		indexer.indexSpecialFile("input/sogou-utf8.xml");
 //		indexer.saveGlobals("forIndex/global.txt");
