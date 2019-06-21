@@ -10,6 +10,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import java.math.*;
@@ -18,10 +19,10 @@ import java.io.*;
 
 
 public class ImageServer extends HttpServlet{
-	public static final int PAGE_RESULT=10;
-	public static final String indexDir="forIndex";
-	public static final String picDir="";
-	private ImageSearcher search=null;
+	public static final int PAGE_RESULT = 10;
+	public static final String indexDir = "forIndex";
+	public static final String picDir = "";
+	private ImageSearcher search = null;
 	public ImageServer(){
 		super();
 		search = new ImageSearcher(new String(indexDir+"/index"));
@@ -29,7 +30,7 @@ public class ImageServer extends HttpServlet{
 	}
 	
 	public ScoreDoc[] showList(ScoreDoc[] results,int page){
-		if(results==null || results.length<(page-1)*PAGE_RESULT){
+		if(results==null || results.length<(page - 1) * PAGE_RESULT){
 			return null;
 		}
 		int start=Math.max((page-1)*PAGE_RESULT, 0);
@@ -47,7 +48,7 @@ public class ImageServer extends HttpServlet{
 		request.setCharacterEncoding("utf-8");
 		String queryString=request.getParameter("query");
 		String pageString=request.getParameter("page");
-		int page=1;
+		int page = 1;
 		if(pageString!=null){
 			page=Integer.parseInt(pageString);
 		}
@@ -55,9 +56,9 @@ public class ImageServer extends HttpServlet{
 			System.out.println("null query");
 			//request.getRequestDispatcher("/Image.jsp").forward(request, response);
 		}else{
-			System.out.println(queryString);
-			System.out.println(URLDecoder.decode(queryString,"utf-8"));
-			System.out.println(URLDecoder.decode(queryString,"gb2312"));
+			System.out.println("Query        : " + queryString);
+			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
+			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
 			String[] tags=null;
 			String[] paths=null;
 			TopDocs results=search.searchQuery(queryString, "title", "content",100);
@@ -68,13 +69,12 @@ public class ImageServer extends HttpServlet{
 					paths = new String[hits.length];
 					for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 						Document doc = search.getDoc(hits[i].doc);
-						System.out.println("doc=" + hits[i].doc + " score="
-								+ hits[i].score + " picPath= "
-								+ doc.get("picPath")+ " tag= "+doc.get("abstract"));
-						tags[i] = doc.get("abstract");
-						paths[i] = picDir + doc.get("picPath");
+						System.out.println("doc = " + hits[i].doc + " score = "
+								+ hits[i].score + " url = "
+								+ doc.get("url")+ " title = "+ doc.get("title"));
+						tags[i] = doc.get("title");
+						paths[i] = picDir + doc.get("url");
 					}
-
 				} else {
 					System.out.println("page null");
 				}

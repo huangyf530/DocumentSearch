@@ -55,7 +55,9 @@ public class ImageSearcher {
 			finalQueryBuilder.setMinimumNumberShouldMatch(1);
 			BooleanQuery finalQuery = finalQueryBuilder.build();
 			TopDocs results = searcher.search(finalQuery, maxnum);
-			System.out.println("Total hits num is " + results.totalHits);
+			if(results != null) {
+				System.out.println("Total hits num is " + results.totalHits);
+			}
 			return results;
 //			Term term = new Term(field1,queryString);
 //			Query query=new SimpleQuery(term,avgLength);

@@ -11,7 +11,7 @@
   <url-pattern>/servlet/ImageServer</url-pattern>
  </servlet-mapping>
  <welcome-file-list>
-  <welcome-file>index.jsp</welcome-file>
+  <welcome-file>imagesearch.jsp</welcome-file>
  </welcome-file-list>
  <login-config>
   <auth-method>BASIC</auth-method>
