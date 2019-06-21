@@ -1,6 +1,5 @@
 import java.io.*;
 import java.nio.file.Paths;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 
@@ -13,7 +12,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.w3c.dom.*;
 import org.jsoup.*;
 
 import javax.xml.parsers.*;
@@ -27,6 +25,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.io.RandomAccessFile;
 import org.apache.pdfbox.text.PDFTextStripper;
+import java.util.*;
 
 
 public class ImageIndexer {
@@ -35,7 +34,7 @@ public class ImageIndexer {
     private double averageLength=1.0f;
     
     public ImageIndexer(String indexDir){
-    	analyzer = new IKAnalyzer4Lucene7();
+    	analyzer = new IKAnalyzer4Lucene7(true);
     	try{
     		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
     		iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
@@ -104,7 +103,8 @@ public class ImageIndexer {
 	 * htmlfile
 	 *
 	 */
-	private void indexHtmlFile(String filename){
+	private void indexHtmlFile(String filename, String url){
+		System.out.println(url);
 		try{
 			org.jsoup.nodes.Document doc = Jsoup.parse(new File(filename), "utf-8");
 //			System.out.println("Title is:"+doc.title());
@@ -114,8 +114,10 @@ public class ImageIndexer {
 			Document document  = new Document();
 			Field contentField  = new TextField("content" ,content,Field.Store.YES);
 			Field titleField = new TextField("title", title, Field.Store.YES);
+			Field urlField = new StringField("url", url, Field.Store.YES);
 			document.add(contentField);
 			document.add(titleField);
+			document.add(urlField);
 			indexWriter.addDocument(document);
 			averageLength += content.length();
 		}
@@ -129,7 +131,7 @@ public class ImageIndexer {
 	 * pdffile
 	 *
 	 */
-	public void indexPdfFile(String filename)
+	public void indexPdfFile(String filename, String url)
 	{
 		String ans;
 		try {
@@ -159,7 +161,7 @@ public class ImageIndexer {
 	 * docxfile
 	 *
 	 */
-	public void indexdocxFile(String filename) {
+	public void indexdocxFile(String filename, String url) {
 		String ans;
 
 		try{
@@ -195,15 +197,68 @@ public class ImageIndexer {
 		System.out.println(delCharSymbol(ans));
 	}
 
-	public String delCharSymbol(String str)
+	private String delCharSymbol(String str)
 	{
 		String temp = str.replace('\t',' ');
 		temp = temp.replaceAll("\n|\r","");
 		return temp;
 	}
 
+	private void readFile(String filename, String url){
+		File dataDir  = new File(filename);
+		if(!dataDir.isDirectory()){
+			if(dataDir.getName().toLowerCase().endsWith(".pdf")){
+				indexPdfFile(filename, url);
+			}
+			if(dataDir.getName().toLowerCase().endsWith(".docx") || dataDir.getName().toLowerCase().endsWith(".doc")){
+				indexdocxFile(filename, url);
+			}
+			if(dataDir.getName().toLowerCase().endsWith(".html")){
+				indexHtmlFile(filename, url);
+			}
+			return;
+		}
+		File[] dataFiles = dataDir.listFiles();
+		if(dataFiles == null){
+			System.out.println(filename + "is empty!");
+			return;
+		}
+		for(int i = 0; i < dataFiles.length; i++){
+			readFile(filename + "/" + dataFiles[i].getName(), url + "/" + dataFiles[i].getName());
+		}
+	}
+
+	private void indexFromDir(String filename){
+		try {
+			File dataDir = new File(filename);
+			if (!dataDir.isDirectory()) {
+				System.out.println("ERROR: " + filename + " should be a directory!");
+				return;
+			}
+			File[] dataFiles = dataDir.listFiles();
+			if (dataFiles == null) {
+				System.out.println("ERROR: " + filename + "is empty!");
+				return;
+			}
+			long startTime = new Date().getTime();
+			for (int i = 0; i < dataFiles.length; i++) {
+				readFile(filename + "/" + dataFiles[i].getName(), dataFiles[i].getName());
+			}
+			indexWriter.close();
+			long endTime = new Date().getTime();
+			System.out.println("It takes " + (endTime - startTime)
+					+ " milliseconds to create index for the files in directory "
+					+ dataDir.getPath());
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void main(String[] args) {
 		ImageIndexer indexer=new ImageIndexer("forIndex/index");
+		indexer.indexFromDir("input");
 		//indexer.indexSpecialFile("input/sogou-utf8.xml");
 		//indexer.saveGlobals("forIndex/global.txt");
 
