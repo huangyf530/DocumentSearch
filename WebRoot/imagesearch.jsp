@@ -64,9 +64,27 @@ System.out.println(basePath);
     background-image: url(pic/sousuo.png);
     background-repeat: no-repeat;
     background-size: 25px;
+
+    background-position: 2px 1.5px;
+
     padding:0 0 0 30px;
 
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
   }
+
+  input:focus{
+    outline:none;
+    border-color: #F03D33;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(240,61,51,.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(240,61,51,.6)
+  }
+
 
   .searchbutton{
     -webkit-appearance : none;
