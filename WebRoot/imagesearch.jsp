@@ -23,11 +23,35 @@ System.out.println(basePath);
   .wrapper{
     position: fixed;
     left: 50%;
-    top: 35%;
+    top: 30%;
     width: 500px;
     height: 250px;
     margin-left: -250px;
     margin-top: -30px;
+  }
+
+  .copyright{
+    position: fixed;
+    left: 50%;
+    top: 100%;
+    width: 500px;
+    height: 30px;
+    margin-left: -250px;
+    margin-top: -30px;
+    color: gray;
+  }
+
+
+
+  .searchbox{
+    height: 30px;
+    width: 460px;
+    font-size:17px;
+    margin-top: 220px;
+    background-image: url(pic/sousuo.png);
+    background-repeat: no-repeat;
+    background-size: 25px;
+    padding:0 0 0 30px;
 
   }
 
@@ -68,7 +92,7 @@ System.out.println(basePath);
 
   <form id="form1" name="form1" method="get" action="servlet/ImageServer">
     <label>
-      <input name="query" type="text" placeholder="请输入要查询的关键字" style="height: 30px; width: 460px; font-size:17px; margin-top: 220px;"/>
+      <input name="query" type="text" class="searchbox" placeholder="请输入要查询的关键字"/>
     </label>
     <br/>
     <br/>
@@ -77,5 +101,10 @@ System.out.println(basePath);
     </label>
   </form>
 </div>
+
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf, Gengw, Jiangdj. All Rights Reserved.</div>
+
+
+
 </body>
 </html>
