@@ -11,7 +11,7 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 //import org.apache.lucene.queryParser.ParseException;
-//import org.apache.lucene.queryParser.QueryParser;
+//import org.apache.lucene.util.QueryBuilder;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
@@ -43,27 +43,31 @@ public class ImageSearcher {
 			//final query
 			BooleanQuery.Builder finalQueryBuilder = new BooleanQuery.Builder();
 			tokenStream.reset();
+			System.out.print("分词结果：");
 			while(tokenStream.incrementToken()){
 				String tmpString = attribute.toString();
+				System.out.print(tmpString + " ");
 				Term term1 = new Term(field1, tmpString);
 				Term term2 = new Term(field2, tmpString);
 				Query query1 = new TermQuery(term1);
 				Query query2 = new TermQuery(term2);
-				finalQueryBuilder.add(new BoostQuery(query1, 4.0f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query1, 2.0f), BooleanClause.Occur.SHOULD);
 				finalQueryBuilder.add(new BoostQuery(query2, 1.0f), BooleanClause.Occur.SHOULD);
 			}
+			System.out.println();
 			finalQueryBuilder.setMinimumNumberShouldMatch(1);
 			BooleanQuery finalQuery = finalQueryBuilder.build();
 			TopDocs results = searcher.search(finalQuery, maxnum);
 			if(results != null) {
 				System.out.println("Total hits num is " + results.totalHits);
 			}
+
 			return results;
 //			Term term = new Term(field1,queryString);
 //			Query query=new SimpleQuery(term,avgLength);
 //			query.setBoost(1.0f);
 //			Weight w=searcher.createNormalizedWeight(query);
-			//System.out.println(w.getClass());
+//			System.out.println(w.getClass());
 //			Query query = new TermQuery(term);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -96,8 +100,8 @@ public class ImageSearcher {
 	}
 	
 	public static void main(String[] args){
-		ImageSearcher search=new ImageSearcher("forIndex/index");
-		search.loadGlobals("forIndex/global.txt");
+		ImageSearcher search=new ImageSearcher("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
+//		search.loadGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 		System.out.println("avg length = "+search.getAvg());
 		
 		TopDocs results=search.searchQuery("清华大学生命科学学院",

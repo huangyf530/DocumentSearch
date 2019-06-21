@@ -25,6 +25,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
 import org.apache.pdfbox.io.RandomAccessFile;
 import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -32,7 +34,9 @@ public class ImageIndexer {
 	private Analyzer analyzer; 
     private IndexWriter indexWriter;
     private double averageLength=1.0f;
-    
+    private long docnum;
+	private SimpleDateFormat dateFormat;
+
     public ImageIndexer(String indexDir){
     	analyzer = new IKAnalyzer4Lucene7(true);
     	try{
@@ -41,17 +45,25 @@ public class ImageIndexer {
     		Directory dir = FSDirectory.open(Paths.get(indexDir));
     		iwc.setSimilarity(new BM25Similarity());
     		indexWriter = new IndexWriter(dir,iwc);
+    		docnum = 0;
+			dateFormat = new SimpleDateFormat("HH:mm:ss");
     		// indexWriter.setSimilarity(new SimpleSimilarity());
     	}catch(IOException e){
     		e.printStackTrace();
     	}
     }
+
+    private String getTime(){
+    	Date date = new Date();
+		return dateFormat.format(date);
+	}
     
     
     public void saveGlobals(String filename){
     	try{
     		PrintWriter pw=new PrintWriter(new File(filename));
     		pw.println(averageLength);
+    		pw.println(docnum);
     		pw.close();
     	}catch(IOException e){
     		e.printStackTrace();
@@ -104,22 +116,47 @@ public class ImageIndexer {
 	 *
 	 */
 	private void indexHtmlFile(String filename, String url){
-		System.out.println(url);
 		try{
 			org.jsoup.nodes.Document doc = Jsoup.parse(new File(filename), "utf-8");
-//			System.out.println("Title is:"+doc.title());
-//			System.out.println("Body is:"+doc.body().text());
+			String content = null;
 			String title = doc.title();
-			String content = doc.body().text();
-			Document document  = new Document();
-			Field contentField  = new TextField("content" ,content,Field.Store.YES);
-			Field titleField = new TextField("title", title, Field.Store.YES);
-			Field urlField = new StringField("url", url, Field.Store.YES);
-			document.add(contentField);
-			document.add(titleField);
-			document.add(urlField);
-			indexWriter.addDocument(document);
-			averageLength += content.length();
+			org.jsoup.nodes.Element head1 = doc.select("h1").first();
+			if(head1 != null && !head1.text().contains(title)) {
+				title = title + "——" + head1.text();
+			}
+			doc.select("header").remove();    // delete header
+			doc.select("nav").remove();       // delete navigate information
+			doc.select("footer").remove();    // delete footer
+			org.jsoup.nodes.Element content2 = doc.select("content").first();
+			if(content2 != null) {
+				content = content2.text();
+				System.out.println("content: " + content2.text());
+			}
+			else{
+				StringBuilder builder = new StringBuilder();
+				org.jsoup.nodes.Element body = doc.body();
+				int k = 0;
+				for(org.jsoup.nodes.Element temp : body.children()){
+					if(temp.hasClass("header") || temp.hasClass("footer")){
+						continue;
+					}
+					builder.append(temp.text() + " ");
+//					System.out.println(k + " " + temp.text());
+//					System.out.println(temp.attributes());
+//					k ++;
+				}
+				content = builder.toString();
+			}
+//			System.out.println("Title is: " + title);
+//			System.out.println("Body is:" + content);
+//			org.jsoup.select.Elements links = doc.select("li");
+//			int linknum = 0;
+//			for (org.jsoup.nodes.Element link : links) {
+//				System.out.println(linknum + ": " + link.text() + link.attr("href"));
+//				linknum++;
+//			}
+//			System.out.println("links number is " + linknum);
+			addDocument(content, title, url, "html");
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -131,16 +168,17 @@ public class ImageIndexer {
 	 * pdffile
 	 *
 	 */
-	public void indexPdfFile(String filename, String url)
+	private void indexPdfFile(String filename, String url)
 	{
 		String title;
 		String content;
 		try {
 			File file = new File(filename);
 
-			PDFParser pdfParser = new PDFParser(new RandomAccessFile(file, "r"));
-			pdfParser.parse();
-			PDDocument pdDocument = pdfParser.getPDDocument();
+//			PDFParser pdfParser = new PDFParser(new RandomAccessFile(file, "r"));
+//			pdfParser.parse();
+//			PDDocument pdDocument = pdfParser.getPDDocument();
+			PDDocument pdDocument = PDDocument.load(file);
 			String all = new PDFTextStripper().getText(pdDocument);
 			pdDocument.close();
 			all = all.trim();
@@ -162,23 +200,17 @@ public class ImageIndexer {
 				title = all.substring(0, breakpoint);
 				content = all.substring(breakpoint + 1);
 			}
+			title = delCharSymbol(title);
+			content = delCharSymbol(content);
+			addDocument(content, title, url, "pdf");
+//			System.out.println(title);
+//			System.out.println(content);
+//			System.out.println(url);
 		}
-		catch(FileNotFoundException e)
+		catch(Exception e)
 		{
-			title = "file not found.";
-			content = "file not found.";
+			e.printStackTrace();
 		}
-		catch(IOException e)
-		{
-			title = "file open error.";
-			content = "file open error.";
-		}
-
-		title = delCharSymbol(title);
-		content = delCharSymbol(content);
-
-		System.out.println(title);
-		System.out.println(content);
 	}
 
 	/**
@@ -229,23 +261,17 @@ public class ImageIndexer {
 				title = all.substring(0, breakpoint);
 				content = all.substring(breakpoint + 1);
 			}
+			title = delCharSymbol(title);
+			content = delCharSymbol(content);
+			addDocument(content, title, url, "docx");
+//			System.out.println(title);
+//			System.out.println(content);
+//			System.out.println(url);
 		}
-		catch(FileNotFoundException e)
+		catch(Exception e)
 		{
-			title = "file not found.";
-			content = "file not found.";
+			e.printStackTrace();
 		}
-		catch(IOException e)
-		{
-			title = "file open error.";
-			content = "file open error.";
-		}
-
-		title = delCharSymbol(title);
-		content = delCharSymbol(content);
-
-		System.out.println(title);
-		System.out.println(content);
 	}
 
 	private String delCharSymbol(String str)
@@ -253,6 +279,25 @@ public class ImageIndexer {
 		String temp = str.replace('\t',' ');
 		temp = temp.replaceAll("\n|\r","");
 		return temp;
+	}
+
+	private void addDocument(String content, String title, String url, String type) throws IOException{
+		Document document  = new Document();
+		Field contentField  = new TextField("content" ,content,Field.Store.YES);
+		Field titleField = new TextField("title", title, Field.Store.YES);
+		Field urlField = new StringField("url", url, Field.Store.YES);
+		Field typeField = new StringField("type", type, Field.Store.YES);
+		document.add(contentField);
+		document.add(titleField);
+		document.add(urlField);
+		document.add(typeField);
+		indexWriter.addDocument(document);
+		averageLength += content.length();
+		indexWriter.commit();
+		docnum++;
+		if(docnum % 500 == 0){
+			System.out.println(getTime() + " Handle " + docnum + " files!");
+		}
 	}
 
 	private void readFile(String filename, String url){
@@ -264,7 +309,7 @@ public class ImageIndexer {
 			if(dataDir.getName().toLowerCase().endsWith(".docx") || dataDir.getName().toLowerCase().endsWith(".doc")){
 				indexdocxFile(filename, url);
 			}
-			if(dataDir.getName().toLowerCase().endsWith(".html")){
+			if(dataDir.getName().toLowerCase().endsWith(".html") || dataDir.getName().toLowerCase().endsWith(".htm")){
 				indexHtmlFile(filename, url);
 			}
 			return;
@@ -292,14 +337,16 @@ public class ImageIndexer {
 				return;
 			}
 			long startTime = new Date().getTime();
+			System.out.println(getTime() + ": begin create index from directory " + dataDir.getCanonicalPath());
 			for (int i = 0; i < dataFiles.length; i++) {
 				readFile(filename + "/" + dataFiles[i].getName(), dataFiles[i].getName());
 			}
 			indexWriter.close();
 			long endTime = new Date().getTime();
-			System.out.println("It takes " + (endTime - startTime)
-					+ " milliseconds to create index for the files in directory "
-					+ dataDir.getPath());
+			System.out.println(getTime() + " It takes " + (endTime - startTime) / 1000
+					+ " seconds to create index for "+ docnum + " files in directory "
+					+ dataDir.getCanonicalPath());
+			averageLength = averageLength / docnum;
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -307,17 +354,21 @@ public class ImageIndexer {
 
 	}
 
+	static {
+		System.setProperty("org.apache.commons.logging.Log",
+				"org.apache.commons.logging.impl.NoOpLog");
+	}
+
 	public static void main(String[] args) {
-		ImageIndexer indexer=new ImageIndexer("forIndex/index");
-		indexer.indexFromDir("input");
+		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
+		indexer.indexFromDir("/Users/huangyf/Dataset/SearchEngine/test/web1");
 		//indexer.indexSpecialFile("input/sogou-utf8.xml");
-		//indexer.saveGlobals("forIndex/global.txt");
+		indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 
-
-		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
-		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
-		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
-//		indexer.indexHtmlFile("input/index.html");
+//		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
+//		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
+//		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
+//		indexer.indexHtmlFile("input/test.html", "");
 //		indexer.indexSpecialFile("input/sogou-utf8.xml");
 //		indexer.saveGlobals("forIndex/global.txt");
 	}
