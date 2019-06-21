@@ -48,12 +48,11 @@ System.out.println(basePath);
     left: 50%;
     top: 10%;
 
-    width: 191px;
-    height: 45px;
+    width: 300px;
 
+    margin-left: -150px;
 
-    margin-top: 0;
-    margin-left: -95px;
+    z-index: 1;
   }
 
   .searchbox{
@@ -105,6 +104,7 @@ System.out.println(basePath);
     margin-top: 0px;
     width: 300px;
     height: 200px;
+    z-index: -1;
   }
 
 
