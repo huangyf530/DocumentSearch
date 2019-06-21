@@ -362,16 +362,15 @@ public class ImageIndexer {
 	}
 
 	public static void main(String[] args) {
-		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
-		indexer.indexFromDir("/Users/huangyf/Dataset/SearchEngine/test/web1");
+//		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
+		ImageIndexer indexer=new ImageIndexer("./forIndex/index");
+//		indexer.indexFromDir("/Users/huangyf/Dataset/SearchEngine/test/web1");
 		//indexer.indexSpecialFile("input/sogou-utf8.xml");
-		indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
+//		indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
 //		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
-//		indexer.indexHtmlFile("input/test.html", "");
-//		indexer.indexSpecialFile("input/sogou-utf8.xml");
-//		indexer.saveGlobals("forIndex/global.txt");
+		indexer.indexHtmlFile("input/test.html", "");
 	}
 }
