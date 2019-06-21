@@ -39,9 +39,22 @@ System.out.println(basePath);
     margin-left: -250px;
     margin-top: -30px;
     color: gray;
+    font-family: Arial;
+    font-size: 13px;
   }
 
+  .title{
+    position: fixed;
+    left: 50%;
+    top: 10%;
 
+    width: 191px;
+    height: 45px;
+
+
+    margin-top: 0;
+    margin-left: -95px;
+  }
 
   .searchbox{
     height: 30px;
@@ -78,11 +91,15 @@ System.out.println(basePath);
 
 
 
-
 </style>
-</head>
-<body style="text-align:center">
 
+  <img class="title" src="/pic/hgss.png"/>
+
+</head>
+
+
+
+<body style="text-align:center">
 
 <div id="Layer1" class="wrapper">
 
@@ -102,7 +119,7 @@ System.out.println(basePath);
   </form>
 </div>
 
-<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf, Gengw, Jiangdj. All Rights Reserved.</div>
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
 
 
 
