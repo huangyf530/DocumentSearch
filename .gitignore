@@ -7,3 +7,4 @@ out/
 input/*
 *.iml
 forIndex/index/*
+forIndex/pagerank.txt
