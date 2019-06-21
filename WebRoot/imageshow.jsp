@@ -15,18 +15,19 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><%=currentQuery + " Page" + currentPage%>></title>
 <style type="text/css">
-<!--
+
 #Layer1 {
 	position:absolute;
-	left:30px;
+	left:10px;
 	top:30px;
-	width:700px;
+	width:1500px;
 	height:50px;
 	z-index:1;
+
 }
 #Layer2 {
 	position:absolute;
-	left:35px;
+	left:135px;
 	top:100px;
 	width:700px;
 	height:600px;
@@ -40,18 +41,73 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 	height:70px;
 	z-index:3;
 }
--->
+
+.searchbox{
+	height: 30px;
+	width: 460px;
+	font-size:17px;
+
+
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+	-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+	transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+
+	margin-left: 0px;
+}
+
+input:focus{
+	outline:none;
+	border-color: #F03D33;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(240,61,51,.6);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(240,61,51,.6)
+}
+
+.searchbutton{
+	-webkit-appearance : none;
+	height: 33px;
+	width: 100px;
+	border-width: 1px; /* 边框宽度 */
+	border-radius: 3px; /* 边框半径 */
+	background: #F03D33; /* 背景颜色 */
+	cursor: pointer; /* 鼠标移入按钮范围时出现手势 */
+	outline: none; /* 不显示轮廓线 */
+	color: white; /* 字体颜色 */
+	font-size: 17px; /* 字体大小 */
+
+	margin-left: 10px;
+
+}
+
+.copyright{
+	position: fixed;
+	left: 50%;
+	top: 100%;
+	width: 500px;
+	height: 30px;
+	margin-left: -250px;
+	margin-top: -30px;
+	color: gray;
+	font-family: Arial;
+	font-size: 13px;
+	text-align:center;
+}
 </style>
 </head>
 
 <body>
 <div id="Layer1">
+	<img src="/pic/hgss.png" style="height:30px; float: left; margin-top: 3px;" />
+
   <form id="form1" name="form1" method="get" action="ImageServer">
     <label>
-      <input name="query" value="<%=currentQuery%>" type="text" size="70" />
+      <input name="query" value="<%=currentQuery%>" type="text" size="70" class = "searchbox"/>
     </label>
     <label>
-    <input type="submit" name="Submit" value="查询" />
+    <input type="submit" name="Submit" value="搜索" class = "searchbutton" />
     </label>
   </form>
 </div>
@@ -104,4 +160,6 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 </div>
 <div>
 </div>
+
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
 </body>
