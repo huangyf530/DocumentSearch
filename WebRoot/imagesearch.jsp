@@ -26,7 +26,7 @@ System.out.println(basePath);
   .wrapper{
     position: fixed;
     left: 50%;
-    top: 40%;
+    top: 55%;
     width: 500px;
     height: 250px;
     margin-left: -250px;
@@ -49,7 +49,7 @@ System.out.println(basePath);
   .title{
     position: fixed;
     left: 50%;
-    top: 18%;
+    top: 10%;
 
     width: 300px;
 
@@ -102,11 +102,14 @@ System.out.println(basePath);
   }
 
   .hyfpic{
-    position: absolute;
-    margin-left: 100px;
-    margin-top: 30px;
+    position: fixed;
+    left: 50%;
+    top: 31%;
     width: 300px;
     height: 200px;
+    margin-left: -150px;
+    margin-top: -100px;
+
     z-index: -1;
   }
 

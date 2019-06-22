@@ -24,7 +24,7 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 	position:absolute;
 	left:10px;
 	top:30px;
-	width:1500px;
+	width:1000px;
 	height:50px;
 	z-index:1;
 }
@@ -239,6 +239,10 @@ a.m:visited{color: #606}
   </Table>
  </div>
 
+	<br/>
+	<br/>
+
+
   <div>
   	<p>
 		<%if(currentPage>1){ %>
@@ -253,12 +257,16 @@ a.m:visited{color: #606}
 		<%}; %>
 		<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage + 1%>">下一页</a>
 	</p>
+	  <p> </p>
+	  <p> </p>
+
+	  <p style="color: white">1</p>
   </div>
 </div>
-<div id="Layer3" style="top: 839px; left: 27px;">
-	
-</div>
+
 <div>
+
+
 </div>
 
 <div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
