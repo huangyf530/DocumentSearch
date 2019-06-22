@@ -16,13 +16,16 @@ int resultnum = (Integer) request.getAttribute("num");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><%=currentQuery + " Page" + currentPage%></title>
-<style type="text/css">
+
+	<link rel="stylesheet" href="/speech-input.css">
+
+	<style type="text/css">
 
 #Layer1 {
 	position:absolute;
 	left:10px;
 	top:30px;
-	width:1500px;
+	width:1000px;
 	height:50px;
 	z-index:1;
 }
@@ -43,7 +46,7 @@ int resultnum = (Integer) request.getAttribute("num");
 	z-index:3;
 }
 
-.searchbox{
+.speech-input{
 	height: 30px;
 	width: 460px;
 	font-size:17px;
@@ -161,7 +164,7 @@ a.m:visited{color: #606}
 
   <form id="form1" name="form1" method="get" action="ImageServer">
     <label>
-      <input name="query" value="<%=currentQuery%>" type="text" size="70" class = "searchbox"/>
+      <input name="query" value="<%=currentQuery%>" type="text" class = "speech-input" autocomplete="off"/>
     </label>
     <label>
     <input type="submit" name="Submit" value="搜索" class = "searchbutton" />
@@ -217,7 +220,6 @@ a.m:visited{color: #606}
 		<div>
 			<a href= <%="https://" + urls[i]%>>
 				<h3><%=(currentPage - 1) * 10 + i + 1%>. <%=titles[i] %></h3>
-				<br>
 			</a>
 		</div>
 		<div>
@@ -232,6 +234,7 @@ a.m:visited{color: #606}
 				<a href="<%="/" + paths[i]%>" class="m">威哥快照</a>
 			</span>
 	    </div>
+	  <br/>
 		<%}; %>
   	<%}else{ %>
 	  <div>no such result</div>
@@ -239,8 +242,12 @@ a.m:visited{color: #606}
   </Table>
  </div>
 
+	<br/>
+	<br/>
+
+
   <div>
-  	<p>
+  	<p style="text-align:center">
 		<%if(currentPage>1){ %>
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage - 1%>">上一页</a>
 		<%}; %>
@@ -258,13 +265,19 @@ a.m:visited{color: #606}
 			<a style="text-decoration: underline; text-decoration: grey">下一页</a>
 		<%};%>
 	</p>
+	  <p> </p>
+	  <p> </p>
+
+	  <p style="color: white">1</p>
   </div>
 </div>
-<div id="Layer3" style="top: 839px; left: 27px;">
-	
-</div>
-<div>
-</div>
 
+<div>
+
+
+</div>
 <div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. & GengW. All Rights Reserved.</div>
 </body>
+<script src="/speech-input.js"></script>
+
+</html>
