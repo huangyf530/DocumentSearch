@@ -1,3 +1,4 @@
+import java.beans.Expression;
 import java.io.*;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -8,6 +9,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FeatureField;
+import org.apache.lucene.expressions.SimpleBindings;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -15,11 +17,13 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.document.Field;
 //import org.apache.lucene.queryParser.ParseException;
 //import org.apache.lucene.util.QueryBuilder;
+import org.apache.lucene.queries.function.FunctionScoreQuery;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.expressions.js.JavascriptCompiler;
 
 
 public class ImageSearcher {
@@ -55,9 +59,9 @@ public class ImageSearcher {
 				Term term1 = new Term(field1, tmpString);
 				Term term2 = new Term(field2, tmpString);
 				Query query1 = new TermQuery(term1);
-				Query query2 = new TermQuery(term2);
-				finalQueryBuilder.add(new BoostQuery(query1, 5.0f), BooleanClause.Occur.SHOULD);
-				finalQueryBuilder.add(new BoostQuery(query2, 0.5f), BooleanClause.Occur.SHOULD);
+				Query query2 = new FuzzyQuery(term2, 1);
+				finalQueryBuilder.add(new BoostQuery(query1, 10.0f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query2, 1f), BooleanClause.Occur.SHOULD);
 			}
 			System.out.println();
 			tokenStream.close();
@@ -67,6 +71,14 @@ public class ImageSearcher {
 			}
 			finalQueryBuilder.setMinimumNumberShouldMatch(1);
 			Query finalQuery = finalQueryBuilder.build();
+
+			// add page rank
+//			org.apache.lucene.expressions.Expression expr = JavascriptCompiler.compile("_score + pagerank");
+//			SimpleBindings bindings = new SimpleBindings();
+//			bindings.add(new SortField("_score", SortField.Type.SCORE));
+//			bindings.add(new SortField("pagerank", SortField.Type.FLOAT));
+
+//			finalQuery = new FunctionScoreQuery(finalQuery, expr.getDoubleValuesSource(bindings));
 			Query pagerank = FeatureField.newSaturationQuery("features", "pagerank");
 			finalQuery = new BooleanQuery.Builder()
 					.add(finalQuery, BooleanClause.Occur.MUST)
@@ -76,14 +88,14 @@ public class ImageSearcher {
 			if(results != null) {
 				highLightDisplay(results, finalQuery, content);
 				System.out.println("Total hits num is " + results.totalHits);
-//				ScoreDoc[] hits = results.scoreDocs;
-//				for(int i = 0; i < hits.length; i++){
-//					if(i > 10){
-//						break;
-//					}
-//					Explanation explanation = searcher.explain(finalQuery, hits[i].doc);
-//					System.out.println(i + ". " + explanation);
-//				}
+				ScoreDoc[] hits = results.scoreDocs;
+				for(int i = 0; i < hits.length; i++){
+					if(i > 10){
+						break;
+					}
+					Explanation explanation = searcher.explain(finalQuery, hits[i].doc);
+					System.out.println(i + ". " + explanation);
+				}
 			}
 
 			return results;

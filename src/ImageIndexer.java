@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.lucene.document.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
@@ -38,12 +39,12 @@ public class ImageIndexer {
     private double averageLength=1.0f;
     private long docnum;
 	private SimpleDateFormat dateFormat;
-	private double average_pagarank;
-	private Map<String, Double> scores;
+	private float average_pagarank;
+	private Map<String, Float> scores;
 	Pattern p;
 
 	public ImageIndexer(String indexDir){
-    	analyzer = new IKAnalyzer4Lucene7(true);
+    	analyzer = new IKAnalyzer4Lucene7();
 		scores = new HashMap<>();
     	try{
     		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -128,8 +129,13 @@ public class ImageIndexer {
 			org.jsoup.nodes.Element eles = doc.select("meta[http-equiv=Content-Type]").first();
 			if(eles != null) {
 				Matcher m = p.matcher(eles.toString());
-				if (m.find())
-					doc = Jsoup.parse(new File(filename), m.group());
+				if (m.find()) {
+					try {
+						doc = Jsoup.parse(new File(filename), m.group());
+					} catch (UnsupportedEncodingException e) {
+						doc = Jsoup.parse(new File(filename), "utf-8");
+					}
+				}
 			}
 			String content = null;
 			String title = doc.title();
@@ -154,11 +160,13 @@ public class ImageIndexer {
 			content = body.text();
 //			System.out.println(title);
 //			System.out.println(content);
+            Path temp = Paths.get(filename);
+            filename = temp.subpath(4, temp.getNameCount()).toString();
 			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
 		}
 		catch (Exception e){
 			System.out.println(scores.get(url) + " " + url);
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -203,7 +211,9 @@ public class ImageIndexer {
 			}
 			title = delCharSymbol(title);
 			content = delCharSymbol(content);
-			addDocument(content, title, url, "pdf", 3.0D, filename);
+            Path temp = Paths.get(filename);
+            filename = temp.subpath(4, temp.getNameCount()).toString();
+			addDocument(content, title, url, "pdf", 1.0f, filename);
 //			System.out.println(title);
 //			System.out.println(content);
 //			System.out.println(url);
@@ -264,7 +274,9 @@ public class ImageIndexer {
 			}
 			title = delCharSymbol(title);
 			content = delCharSymbol(content);
-			addDocument(content, title, url, "docx", 3.0D, filename);
+            Path temp = Paths.get(filename);
+            filename = temp.subpath(4, temp.getNameCount()).toString();
+			addDocument(content, title, url, "docx", 1.0f, filename);
 //			System.out.println(title);
 //			System.out.println(content);
 //			System.out.println(url);
@@ -282,13 +294,14 @@ public class ImageIndexer {
 		return temp;
 	}
 
-	private void addDocument(String content, String title, String url, String type, Double boost, String path) throws IOException{
+	private void addDocument(String content, String title, String url, String type, float boost, String path) throws IOException{
 		Document document  = new Document();
 		Field contentField  = new TextField("content" ,content,Field.Store.YES);
 		Field titleField = new TextField("title", title, Field.Store.YES);
 		Field urlField = new StringField("url", url, Field.Store.YES);
 		Field typeField = new StringField("type", type, Field.Store.YES);
-		Field scoreField = new FeatureField("features", "pagerank", boost.floatValue());
+		Field scoreField = new FeatureField("features", "pagerank", boost);
+//		Field scoreField = new FloatDocValuesField("pagerank", boost);
 		Field pathField = new StringField("path", path, Field.Store.YES);
 		document.add(contentField);
 		document.add(titleField);
@@ -331,7 +344,7 @@ public class ImageIndexer {
 
 	private void loadPageRank(String filename){
 		int urlnum = 0;
-		double totalscore = 0.0;
+		float totalscore = 0f;
 		String line;
 		System.out.println(getTime() + " Begin Load Page Rank Score from " + filename);
 		try {
@@ -343,7 +356,7 @@ public class ImageIndexer {
 				String[] contents = line.split("\t");
 				try {
 					totalscore += Double.parseDouble(contents[1]);
-					scores.put(contents[0], Double.parseDouble(contents[1]));
+					scores.put(contents[0], Float.parseFloat(contents[1]));
 					urlnum += 1;
 				}
 				catch (ArrayIndexOutOfBoundsException e){
@@ -408,18 +421,16 @@ public class ImageIndexer {
 			for (File temp : files) {
 				indexer.indexFromDir(temp.getCanonicalPath());
 			}
+			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 			indexer.indexWriter.close();
-			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index/global.txt");
 		}
 		catch (IOException e){
 			e.printStackTrace();
 		}
-		//indexer.indexSpecialFile("input/sogou-utf8.xml");
-		indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 //
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
 //		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
-//		indexer.indexHtmlFile("input/test.html", "");
+//		indexer.indexHtmlFile("input/shimin.htm", "");
 	}
 }

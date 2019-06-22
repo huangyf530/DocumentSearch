@@ -67,7 +67,6 @@ public class ImageServer extends HttpServlet{
 		String pageString=request.getParameter("page");
 		String typeString = request.getParameter("type");
 		int page = 1;
-		System.out.println(typeString);
 		if(typeString == null){
 			typeString = "all";
 		}
@@ -94,9 +93,9 @@ public class ImageServer extends HttpServlet{
 					titles[i] = doc.get("title");
 					urls[i] = picDir + doc.get("url");
 					types[i] = doc.get("type");
-					Path temp = Paths.get(doc.get("path"));
-					paths[i] = temp.subpath(4, temp.getNameCount()).toString();
-					base[i] = temp.subpath(6, 7).toString();
+					paths[i] = doc.get("path");
+                    Path temp = Paths.get(doc.get("url"));
+					base[i] = temp.subpath(0, 1).toString();
 					System.out.println("doc = " + hits[i].doc + " score = "
 							+ hits[i].score + " base = " + base[i]);
 				}
