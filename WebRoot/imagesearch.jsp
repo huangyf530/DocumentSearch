@@ -15,6 +15,9 @@ System.out.println(basePath);
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>搜索</title>
+
+  <link rel="stylesheet" href="speech-input.css">
+
 <style type="text/css">
 *{
   margin: 0;
@@ -126,7 +129,7 @@ System.out.println(basePath);
 
   <form id="form1" name="form1" method="get" action="servlet/ImageServer">
     <label>
-      <input name="query" type="text" class="searchbox" placeholder="请输入要查询的关键字"/>
+      <input name="query" type="text" class="speech-input" placeholder="请输入要查询的关键字"/>
     </label>
     <br/>
     <br/>
@@ -141,4 +144,7 @@ System.out.println(basePath);
 
 
 </body>
+
+<script src="speech-input.js"></script>
+
 </html>
