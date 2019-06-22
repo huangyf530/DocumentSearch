@@ -23,7 +23,7 @@ import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.expressions.js.JavascriptCompiler;
+//import org.apache.lucene.expressions.js.JavascriptCompiler;
 
 
 public class ImageSearcher {
