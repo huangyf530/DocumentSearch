@@ -244,7 +244,7 @@ a.m:visited{color: #606}
 
 
   <div>
-  	<p>
+  	<p style="text-align:center">
 		<%if(currentPage>1){ %>
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage - 1%>">上一页</a>
 		<%}; %>
