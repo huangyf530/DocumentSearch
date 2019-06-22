@@ -6,6 +6,6 @@
 	<entry key="ext_dict">/mydict.dic; /mypack/mydict2.dic ; /com/mycompany/dic/mydict3.dic ;</entry> 
 	 --> 
 	 <!--用户可以在这里配置自己的扩展停止词字典-->
-	<entry key="ext_dict">ext_stopword.dic</entry>
+	<entry key="ext_dict">/Users/huangyf/Desktop/大三春季学期/搜索引擎技术基础/Homework/3BigHomework/ImageSearch/WebRoot/WEB-INF/ext_stopword.dic</entry>
 
 </properties>

@@ -58,13 +58,13 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 <div id="Layer2" style="top: 82px; height: 585px;">
   <div id="imagediv">结果显示如下：
   <br>
-  <Table style="left: 0px; width: 594px;">
+  <Table style="left: 0px; width: 600px;">
   <% 
   	String[] titles=(String[]) request.getAttribute("titles");
   	String[] urls = (String[]) request.getAttribute("urls");
   	String[] contents = (String[]) request.getAttribute("contents");
   	if(titles!=null && titles.length>0){
-		for(int i = 0; i < titles.length; i++){%>
+		for(int i = 0; i < 10 && i< titles.length; i++){%>
 		<div>
 			<a href= <%="https://" + urls[i]%>>
 				<h3><%=(currentPage - 1) * 10 + i + 1%>. <%=titles[i] %></h3>

@@ -22,11 +22,19 @@ public class ImageServer extends HttpServlet{
 	public static final int PAGE_RESULT = 10;
 	public static final String indexDir = "forIndex";
 	public static final String picDir = "";
+	String[] titles = null;
+	String[] paths = null;
+	String[] contents = null;
+	String[] types = null;
 	private ImageSearcher search = null;
 	public ImageServer(){
 		super();
 		search = new ImageSearcher(new String(indexDir+"/index"));
 		search.loadGlobals(new String(indexDir+"/global.txt"));
+		titles = new String[100];
+		paths = new String[100];
+		contents = new String[100];
+		types = new String[100];
 	}
 	
 	public ScoreDoc[] showList(ScoreDoc[] results,int page){
@@ -57,20 +65,12 @@ public class ImageServer extends HttpServlet{
 			//request.getRequestDispatcher("/Image.jsp").forward(request, response);
 		}else{
 			System.out.println("Query        : " + queryString);
-			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
-			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
-			String[] titles = null;
-			String[] paths = null;
-			String[] contents = null;
-			String[] types = null;
-			TopDocs results=search.searchQuery(queryString, "title", "content",100);
+//			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
+//			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
+			TopDocs results=search.searchQuery(queryString, "title", "content",100, contents);
 			if (results != null) {
 				ScoreDoc[] hits = showList(results.scoreDocs, page);
 				if (hits != null) {
-					titles = new String[hits.length];
-					paths = new String[hits.length];
-					contents = new String[hits.length];
-					types = new String[hits.length];
 					for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 						Document doc = search.getDoc(hits[i].doc);
 						System.out.println("doc = " + hits[i].doc + " score = "
@@ -78,12 +78,6 @@ public class ImageServer extends HttpServlet{
 								+ doc.get("url")+ " title = "+ doc.get("title"));
 						titles[i] = doc.get("title");
 						paths[i] = picDir + doc.get("url");
-						if(doc.get("content").length() < 100){
-							contents[i] = doc.get("content");
-						}
-						else{
-							contents[i] = doc.get("content").substring(0,100) + "...";
-						}
 						types[i] = doc.get("type");
 					}
 				} else {

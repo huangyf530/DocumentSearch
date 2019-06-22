@@ -7,15 +7,20 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FeatureField;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.document.Field;
 //import org.apache.lucene.queryParser.ParseException;
 //import org.apache.lucene.util.QueryBuilder;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.highlight.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+
 
 public class ImageSearcher {
 	private IndexReader reader;
@@ -35,7 +40,7 @@ public class ImageSearcher {
 		}
 	}
 	
-	public TopDocs searchQuery(String queryString,String field1, String field2,int maxnum){
+	public TopDocs searchQuery(String queryString,String field1, String field2,int maxnum, String[] content){
 		try {
 			StringReader stringReader = new StringReader(queryString);
 			TokenStream tokenStream = analyzer.tokenStream("", stringReader);
@@ -52,13 +57,20 @@ public class ImageSearcher {
 				Query query1 = new TermQuery(term1);
 				Query query2 = new TermQuery(term2);
 				finalQueryBuilder.add(new BoostQuery(query1, 2.0f), BooleanClause.Occur.SHOULD);
-				finalQueryBuilder.add(new BoostQuery(query2, 1.0f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query2, 0.5f), BooleanClause.Occur.SHOULD);
 			}
 			System.out.println();
+			tokenStream.close();
 			finalQueryBuilder.setMinimumNumberShouldMatch(1);
 			BooleanQuery finalQuery = finalQueryBuilder.build();
-			TopDocs results = searcher.search(finalQuery, maxnum);
+			Query pagerank = FeatureField.newSaturationQuery("features", "pagerank");
+			Query boostedQuery = new BooleanQuery.Builder()
+					.add(finalQuery, BooleanClause.Occur.MUST)
+					.add(new BoostQuery(pagerank, 10f), BooleanClause.Occur.SHOULD)
+					.build();
+			TopDocs results = searcher.search(boostedQuery, maxnum);
 			if(results != null) {
+				highLightDisplay(results, boostedQuery, content);
 				System.out.println("Total hits num is " + results.totalHits);
 			}
 
@@ -98,14 +110,30 @@ public class ImageSearcher {
 	public float getAvg(){
 		return avgLength;
 	}
+
+	private void highLightDisplay (TopDocs topDocs, Query queryToSearch, String[] contents) throws InvalidTokenOffsetsException, IOException {
+		ScoreDoc [] scoreDoc = topDocs.scoreDocs;
+		SimpleHTMLFormatter simpleHTMLFormatter = new SimpleHTMLFormatter("<font color='red'>", "</font>");
+
+		Highlighter highlighter = new Highlighter(simpleHTMLFormatter, new QueryScorer(queryToSearch));
+		highlighter.setTextFragmenter(new SimpleFragmenter(20));
+		for(int i = 0; i < scoreDoc.length; i++){
+			int id =scoreDoc[i].doc;
+			Document docHit = getDoc(id);
+			String text = docHit.get("content");
+			TokenStream tokenStream = analyzer.tokenStream("content", new StringReader(text));
+			String highLightText = highlighter.getBestFragments(tokenStream, text, 5, "...");
+			contents[i] = highLightText;
+		}
+	}
 	
 	public static void main(String[] args){
 		ImageSearcher search=new ImageSearcher("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
 //		search.loadGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 		System.out.println("avg length = "+search.getAvg());
-		
+		String[] contents = new String[100];
 		TopDocs results=search.searchQuery("清华大学生命科学学院",
-									"title", "content", 100);
+									"title", "content", 100, contents);
 		ScoreDoc[] hits = results.scoreDocs;
 		for (int i = 0; i < hits.length; i++) { // output raw format
 			Document doc = search.getDoc(hits[i].doc);

@@ -6,11 +6,12 @@ import org.jgrapht.alg.scoring.PageRank;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class CalPageRank {
     Graph<String, DefaultEdge> graph;
@@ -37,13 +38,22 @@ public class CalPageRank {
 //                System.out.println(linknum + ": " + link.text() + link.attr("href"));
                 linknum++;
                 String temp = link.attr("href");
+                if(temp.length() <= 1){
+                    continue;
+                }
                 if(temp.length() >= 4 && temp.substring(0, 4).equals("http")){
 //                    System.out.println(temp.substring(temp.indexOf("://") + 3));
                     temp = temp.substring(temp.indexOf("://") + 3);
                 }
-                else{
+                else if(!temp.contains(".htm")){
+                    continue;
+                }
+                else if(temp.substring(0, 1).equals("/")){
 //                    System.out.println(base + link.attr("href"));
                     temp = base + temp;
+                }
+                else {
+                    temp = Paths.get(url + "/../" + temp).normalize().toString();
                 }
                 if(!websites.contains(temp)){
                     websites.add(temp);
@@ -141,7 +151,7 @@ public class CalPageRank {
         CalPageRank calPageRank = new CalPageRank();
 //        calPageRank.indexHtmlFile("input/test.html", "h", "h");
         try {
-            File datadir = new File("/Users/huangyf/Dataset/SearchEngine/Big");
+            File datadir = new File("/Users/huangyf/Dataset/SearchEngine/test");
             File[] dataFiles = datadir.listFiles();
             for(File file : dataFiles){
                 System.out.println("From " + file.getCanonicalPath());
@@ -154,5 +164,8 @@ public class CalPageRank {
         catch (Exception e){
             e.printStackTrace();
         }
+//        Path p1 = Paths.get("/articles/baeldung/logs");
+//        Path p2 = Paths.get("articles/baeldung/logs + ./hhh");
+//        System.out.println(p2.normalize().toString());
     }
 }
