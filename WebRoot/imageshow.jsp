@@ -1,14 +1,15 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 <%
-request.setCharacterEncoding("utf-8");
-response.setCharacterEncoding("utf-8");
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-String imagePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/";
-String currentQuery=(String) request.getAttribute("currentQuery");
-String currentType = (String) request.getAttribute("currentType");
-int currentPage=(Integer) request.getAttribute("currentPage");
-int resultnum = (Integer) request.getAttribute("num");
+	request.setCharacterEncoding("utf-8");
+	response.setCharacterEncoding("utf-8");
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	String imagePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/";
+	String currentQuery=(String) request.getAttribute("currentQuery");
+	String currentType = (String) request.getAttribute("currentType");
+	int currentPage=(Integer) request.getAttribute("currentPage");
+	int resultnum = (Integer) request.getAttribute("num");
+	double time = (Double) request.getAttribute("time");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -204,8 +205,12 @@ a.m:visited{color: #606}
 	<br/>
 
 
-	<div id="imagediv">结果显示如下：
-  <br>
+	<div style="color:grey; font-size: 15px;">
+		找到 <%=resultnum%> 条结果（用时 <%=time%> s），结果显示如下：
+	</div>
+
+
+	<div id="imagediv">
   <Table style="left: 0px; width: 600px;">
   <% 
   	String[] titles=(String[]) request.getAttribute("titles");
@@ -213,13 +218,14 @@ a.m:visited{color: #606}
   	String[] contents = (String[]) request.getAttribute("contents");
   	String[] paths = (String[]) request.getAttribute("paths");
   	String[] base = (String[]) request.getAttribute("base");
+  	String[] types = (String[]) request.getAttribute("types");
   	int showpagenum = Math.min(currentPage + 5, Math.floorDiv(resultnum + 9, 10));
-  	System.out.println("title length: " + resultnum + "   page to show: " + showpagenum);
-  	if(titles!=null && titles.length>0){
-		for(int i = 0; i < 10 && i< titles.length; i++){%>
+  	int remain_num = resultnum - (currentPage - 1) * 10;
+  	if(titles!=null && remain_num>0){
+		for(int i = 0; i < 10 && i< remain_num; i++){%>
 		<div>
 			<a href= <%="https://" + urls[i]%>>
-				<h3><%=(currentPage - 1) * 10 + i + 1%>. <%=titles[i] %></h3>
+				<h3><%=types[i]%><%=titles[i] %></h3>
 			</a>
 		</div>
 		<div>
@@ -237,7 +243,7 @@ a.m:visited{color: #606}
 	  <br/>
 		<%}; %>
   	<%}else{ %>
-	  <div>no such result</div>
+	  <div style="font-size: 70px; color:#F03D33">no such result</div>
   	<%}; %>
   </Table>
  </div>
@@ -258,11 +264,8 @@ a.m:visited{color: #606}
 		<%for (int i=currentPage + 1;i<=showpagenum;i++){ %>
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
-		<%if (showpagenum != Math.floorDiv(resultnum + 9, 10)){ %>
+		<%if (currentPage < Math.floorDiv(resultnum + 9, 10)){ %>
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage + 1%>">下一页</a>
-		<%};%>
-		<%if (showpagenum == Math.floorDiv(resultnum + 9, 10)){%>
-			<a style="text-decoration: underline; text-decoration: grey">下一页</a>
 		<%};%>
 	</p>
 	  <p> </p>

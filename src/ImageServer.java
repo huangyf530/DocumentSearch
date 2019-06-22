@@ -84,17 +84,22 @@ public class ImageServer extends HttpServlet{
 		System.out.println("Query        : " + queryString);
 //			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
 //			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
-		TopDocs results;
-		results = search.searchQuery(queryString, "title", "content", typeString, 100, contents);
+		long startTime = new Date().getTime();
+		TopDocs results = search.searchQuery(queryString, "title", "content", typeString, 100, contents);
 		if (results != null) {
 			num = results.scoreDocs.length;
 			ScoreDoc[] hits = showList(results.scoreDocs, page);
 			if (hits != null) {
 				for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
 					Document doc = search.getDoc(hits[i].doc);
+					if(!doc.get("type").equals("html")){
+						types[i] = "<sup>[" + doc.get("type") + "]</sup> ";
+					}
+					else{
+						types[i] = "";
+					}
 					titles[i] = doc.get("title");
 					urls[i] = picDir + doc.get("url");
-					types[i] = doc.get("type");
 					paths[i] = doc.get("path");
                     Path temp = Paths.get(doc.get("url"));
 					base[i] = temp.subpath(0, 1).toString();
@@ -107,6 +112,7 @@ public class ImageServer extends HttpServlet{
 		}else{
 			System.out.println("result null");
 		}
+		double eclipseTime = (double)(new Date().getTime() - startTime) / 1000D;
 		request.setAttribute("currentQuery",queryString);
 		request.setAttribute("currentPage", page);
 		request.setAttribute("currentType", typeString);
@@ -115,7 +121,9 @@ public class ImageServer extends HttpServlet{
 		request.setAttribute("contents", contents);
 		request.setAttribute("paths", paths);
 		request.setAttribute("base", base);
+		request.setAttribute("types", types);
 		request.setAttribute("num", num);
+		request.setAttribute("time", eclipseTime);
 		request.getRequestDispatcher("/imageshow.jsp").forward(request,
 				response);
 	}
