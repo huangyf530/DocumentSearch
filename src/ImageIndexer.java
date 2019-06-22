@@ -144,8 +144,8 @@ public class ImageIndexer {
 				title = title + "——" + head1.text();
 			}
 			doc.select("header").remove();    // delete header
-			doc.select("nav").remove();       // delete navigate information
-			doc.select("footer").remove();    // delete footer
+//			doc.select("nav").remove();       // delete navigate information
+//			doc.select("footer").remove();    // delete footer
 			org.jsoup.nodes.Element body = doc.body();
 			int k = 0;
 //			for(org.jsoup.nodes.Element temp : body.children()){
