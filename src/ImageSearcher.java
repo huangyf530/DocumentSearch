@@ -40,7 +40,7 @@ public class ImageSearcher {
 		}
 	}
 	
-	public TopDocs searchQuery(String queryString,String field1, String field2,int maxnum, String[] content){
+	public TopDocs searchQuery(String queryString,String field1, String field2, String type, int maxnum, String[] content){
 		try {
 			StringReader stringReader = new StringReader(queryString);
 			TokenStream tokenStream = analyzer.tokenStream("", stringReader);
@@ -56,22 +56,34 @@ public class ImageSearcher {
 				Term term2 = new Term(field2, tmpString);
 				Query query1 = new TermQuery(term1);
 				Query query2 = new TermQuery(term2);
-				finalQueryBuilder.add(new BoostQuery(query1, 2.0f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query1, 5.0f), BooleanClause.Occur.SHOULD);
 				finalQueryBuilder.add(new BoostQuery(query2, 0.5f), BooleanClause.Occur.SHOULD);
 			}
 			System.out.println();
 			tokenStream.close();
+			if(type != null){
+				Query typequery = new TermQuery(new Term("type", type));
+				finalQueryBuilder.add(typequery, BooleanClause.Occur.MUST);
+			}
 			finalQueryBuilder.setMinimumNumberShouldMatch(1);
-			BooleanQuery finalQuery = finalQueryBuilder.build();
+			Query finalQuery = finalQueryBuilder.build();
 			Query pagerank = FeatureField.newSaturationQuery("features", "pagerank");
-			Query boostedQuery = new BooleanQuery.Builder()
+			finalQuery = new BooleanQuery.Builder()
 					.add(finalQuery, BooleanClause.Occur.MUST)
 					.add(new BoostQuery(pagerank, 10f), BooleanClause.Occur.SHOULD)
 					.build();
-			TopDocs results = searcher.search(boostedQuery, maxnum);
+			TopDocs results = searcher.search(finalQuery, maxnum);
 			if(results != null) {
-				highLightDisplay(results, boostedQuery, content);
+				highLightDisplay(results, finalQuery, content);
 				System.out.println("Total hits num is " + results.totalHits);
+				ScoreDoc[] hits = results.scoreDocs;
+				for(int i = 0; i < hits.length; i++){
+					if(i > 10){
+						break;
+					}
+					Explanation explanation = searcher.explain(finalQuery, hits[i].doc);
+					System.out.println(i + ". " + explanation);
+				}
 			}
 
 			return results;
@@ -133,7 +145,7 @@ public class ImageSearcher {
 		System.out.println("avg length = "+search.getAvg());
 		String[] contents = new String[100];
 		TopDocs results=search.searchQuery("清华大学生命科学学院",
-									"title", "content", 100, contents);
+									"title", "content", null,100, contents);
 		ScoreDoc[] hits = results.scoreDocs;
 		for (int i = 0; i < hits.length; i++) { // output raw format
 			Document doc = search.getDoc(hits[i].doc);

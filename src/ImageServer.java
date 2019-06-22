@@ -7,10 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import java.math.*;
@@ -22,10 +25,13 @@ public class ImageServer extends HttpServlet{
 	public static final int PAGE_RESULT = 10;
 	public static final String indexDir = "forIndex";
 	public static final String picDir = "";
+
 	String[] titles = null;
 	String[] paths = null;
 	String[] contents = null;
 	String[] types = null;
+	String[] urls = null;
+	String[] base = null;
 	private ImageSearcher search = null;
 	public ImageServer(){
 		super();
@@ -35,17 +41,20 @@ public class ImageServer extends HttpServlet{
 		paths = new String[100];
 		contents = new String[100];
 		types = new String[100];
+		urls = new String[100];
+		base = new String[100];
 	}
 	
 	public ScoreDoc[] showList(ScoreDoc[] results,int page){
-		if(results==null || results.length<(page - 1) * PAGE_RESULT){
+		if(results == null || results.length < (page - 1) * PAGE_RESULT){
 			return null;
 		}
-		int start=Math.max((page-1)*PAGE_RESULT, 0);
-		int docnum=Math.min(results.length-start,PAGE_RESULT);
-		ScoreDoc[] ret=new ScoreDoc[docnum];
-		for(int i=0;i<docnum;i++){
-			ret[i]=results[start+i];
+		int start = Math.max((page - 1) * PAGE_RESULT, 0);
+		int docnum = Math.min(results.length - start,PAGE_RESULT);
+		ScoreDoc[] ret = new ScoreDoc[docnum];
+		for(int i = 0;i < docnum; i++){
+			ret[i] = results[start + i];
+			contents[i] = contents[start + i];
 		}
 		return ret;
 	}
@@ -56,44 +65,63 @@ public class ImageServer extends HttpServlet{
 		request.setCharacterEncoding("utf-8");
 		String queryString=request.getParameter("query");
 		String pageString=request.getParameter("page");
+		String typeString = request.getParameter("type");
 		int page = 1;
-		if(pageString!=null){
+		if(pageString != null){
 			page=Integer.parseInt(pageString);
 		}
-		if(queryString==null){
+		if(queryString == null || queryString.equals("")){
 			System.out.println("null query");
+			request.getRequestDispatcher("/imagesearch.jsp").forward(request,
+					response);
+			return;
 			//request.getRequestDispatcher("/Image.jsp").forward(request, response);
-		}else{
-			System.out.println("Query        : " + queryString);
+		}
+		System.out.println("Query        : " + queryString);
 //			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
 //			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
-			TopDocs results=search.searchQuery(queryString, "title", "content",100, contents);
-			if (results != null) {
-				ScoreDoc[] hits = showList(results.scoreDocs, page);
-				if (hits != null) {
-					for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
-						Document doc = search.getDoc(hits[i].doc);
-						System.out.println("doc = " + hits[i].doc + " score = "
-								+ hits[i].score + " url = "
-								+ doc.get("url")+ " title = "+ doc.get("title"));
-						titles[i] = doc.get("title");
-						paths[i] = picDir + doc.get("url");
-						types[i] = doc.get("type");
-					}
-				} else {
-					System.out.println("page null");
-				}
-			}else{
-				System.out.println("result null");
-			}
-			request.setAttribute("currentQuery",queryString);
-			request.setAttribute("currentPage", page);
-			request.setAttribute("titles", titles);
-			request.setAttribute("urls", paths);
-			request.setAttribute("contents", contents);
-			request.getRequestDispatcher("/imageshow.jsp").forward(request,
-					response);
+		TopDocs results;
+		if(typeString == null) {
+			results = search.searchQuery(queryString, "title", "content", null, 100, contents);
 		}
+		else if(typeString.equals("html")) {
+			results = search.searchQuery(queryString, "title", "content", "html", 100, contents);
+		}
+		else if(typeString.equals("pdf")) {
+			results = search.searchQuery(queryString, "title", "content", "pdf", 100, contents);
+		}
+		else{
+			results = search.searchQuery(queryString, "title", "content", "docx", 100, contents);
+		}
+		if (results != null) {
+			ScoreDoc[] hits = showList(results.scoreDocs, page);
+			if (hits != null) {
+				for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
+					Document doc = search.getDoc(hits[i].doc);
+					titles[i] = doc.get("title");
+					urls[i] = picDir + doc.get("url");
+					types[i] = doc.get("type");
+					Path temp = Paths.get(doc.get("path"));
+					paths[i] = temp.subpath(4, temp.getNameCount()).toString();
+					base[i] = temp.subpath(6, 7).toString();
+					System.out.println("doc = " + hits[i].doc + " score = "
+							+ hits[i].score + " base = " + base[i]);
+				}
+			} else {
+				System.out.println("page null");
+			}
+		}else{
+			System.out.println("result null");
+		}
+		request.setAttribute("currentQuery",queryString);
+		request.setAttribute("currentPage", page);
+		request.setAttribute("titles", titles);
+		request.setAttribute("urls", urls);
+		request.setAttribute("contents", contents);
+		request.setAttribute("paths", paths);
+		request.setAttribute("base", base);
+		request.getRequestDispatcher("/imageshow.jsp").forward(request,
+				response);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)

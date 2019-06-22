@@ -95,6 +95,18 @@ input:focus{
 	font-size: 13px;
 	text-align:center;
 }
+.m,
+a.m{
+	color:#666;
+	font-size: 13px;
+}
+a.m:visited{color: #606}
+
+.c-showurl{
+	font-size: 13px;
+	color: forestgreen;
+}
+
 </style>
 </head>
 
@@ -119,6 +131,8 @@ input:focus{
   	String[] titles=(String[]) request.getAttribute("titles");
   	String[] urls = (String[]) request.getAttribute("urls");
   	String[] contents = (String[]) request.getAttribute("contents");
+  	String[] paths = (String[]) request.getAttribute("paths");
+  	String[] base = (String[]) request.getAttribute("base");
   	if(titles!=null && titles.length>0){
 		for(int i = 0; i < 10 && i< titles.length; i++){%>
 		<div>
@@ -132,6 +146,13 @@ input:focus{
 				<%=contents[i]%>
 			</span>
 		</div>
+	    <div>
+			<a href="<%="https://" + base[i]%>" class="c-showurl"><%=base[i] + "/"%></a>
+			<span>
+				 -
+				<a href="<%="/" + paths[i]%>" class="m">快照</a>
+			</span>
+	    </div>
 		<%}; %>
   	<%}else{ %>
 	  <div>no such result</div>
