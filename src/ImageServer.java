@@ -67,6 +67,10 @@ public class ImageServer extends HttpServlet{
 		String pageString=request.getParameter("page");
 		String typeString = request.getParameter("type");
 		int page = 1;
+		System.out.println(typeString);
+		if(typeString == null){
+			typeString = "all";
+		}
 		if(pageString != null){
 			page=Integer.parseInt(pageString);
 		}
@@ -81,18 +85,7 @@ public class ImageServer extends HttpServlet{
 //			System.out.println("Query(utf-8) : " + URLDecoder.decode(queryString, StandardCharsets.UTF_8));
 //			System.out.println("Query(gb2312): " + URLDecoder.decode(queryString, "gb2312"));
 		TopDocs results;
-		if(typeString == null) {
-			results = search.searchQuery(queryString, "title", "content", null, 100, contents);
-		}
-		else if(typeString.equals("html")) {
-			results = search.searchQuery(queryString, "title", "content", "html", 100, contents);
-		}
-		else if(typeString.equals("pdf")) {
-			results = search.searchQuery(queryString, "title", "content", "pdf", 100, contents);
-		}
-		else{
-			results = search.searchQuery(queryString, "title", "content", "docx", 100, contents);
-		}
+		results = search.searchQuery(queryString, "title", "content", typeString, 100, contents);
 		if (results != null) {
 			ScoreDoc[] hits = showList(results.scoreDocs, page);
 			if (hits != null) {
@@ -115,6 +108,7 @@ public class ImageServer extends HttpServlet{
 		}
 		request.setAttribute("currentQuery",queryString);
 		request.setAttribute("currentPage", page);
+		request.setAttribute("currentType", typeString);
 		request.setAttribute("titles", titles);
 		request.setAttribute("urls", urls);
 		request.setAttribute("contents", contents);

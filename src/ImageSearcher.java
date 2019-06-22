@@ -61,7 +61,7 @@ public class ImageSearcher {
 			}
 			System.out.println();
 			tokenStream.close();
-			if(type != null){
+			if(!type.equals("all")){
 				Query typequery = new TermQuery(new Term("type", type));
 				finalQueryBuilder.add(typequery, BooleanClause.Occur.MUST);
 			}
@@ -76,14 +76,14 @@ public class ImageSearcher {
 			if(results != null) {
 				highLightDisplay(results, finalQuery, content);
 				System.out.println("Total hits num is " + results.totalHits);
-				ScoreDoc[] hits = results.scoreDocs;
-				for(int i = 0; i < hits.length; i++){
-					if(i > 10){
-						break;
-					}
-					Explanation explanation = searcher.explain(finalQuery, hits[i].doc);
-					System.out.println(i + ". " + explanation);
-				}
+//				ScoreDoc[] hits = results.scoreDocs;
+//				for(int i = 0; i < hits.length; i++){
+//					if(i > 10){
+//						break;
+//					}
+//					Explanation explanation = searcher.explain(finalQuery, hits[i].doc);
+//					System.out.println(i + ". " + explanation);
+//				}
 			}
 
 			return results;

@@ -150,7 +150,6 @@ a.m:visited{color: #606}
 	#S_tab a:hover{
 		color:#323232;
 	}
->>>>>>> 64a31f66c3663053ad03d1ee2a001d178d111ac0
 
 </style>
 </head>
@@ -171,28 +170,28 @@ a.m:visited{color: #606}
 <div id="Layer2" style="top: 82px; height: 585px;">
 
 	<div id="S_tab" class="s_tab">
-		<%if(currentType == "all") {%>
+		<%if(currentType.equals("all")) {%>
 		<b>全部</b>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
-		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
-		<%} else if(currentType == "html"){%>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=docx">DOCX</a>
+		<%} else if(currentType.equals("html")){%>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
 		<b>HTML</b>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
-		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
-		<%} else if(currentType == "pdf"){%>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=docx">DOCX</a>
+		<%} else if(currentType.equals("pdf")){%>
 
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
 		<b>PDF</b>
-		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=docx">DOCX</a>
 
-		<%} else if(currentType == "doc"){%>
+		<%} else if(currentType.equals("docx")){%>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
 		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
-		<b>DOC</b>
+		<b>DOCX</b>
 
 		<%};%>
 
