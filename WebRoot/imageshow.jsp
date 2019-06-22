@@ -217,7 +217,6 @@ a.m:visited{color: #606}
 		<div>
 			<a href= <%="https://" + urls[i]%>>
 				<h3><%=(currentPage - 1) * 10 + i + 1%>. <%=titles[i] %></h3>
-				<br>
 			</a>
 		</div>
 		<div>
@@ -232,6 +231,7 @@ a.m:visited{color: #606}
 				<a href="<%="/" + paths[i]%>" class="m">快照</a>
 			</span>
 	    </div>
+	  <br/>
 		<%}; %>
   	<%}else{ %>
 	  <div>no such result</div>
