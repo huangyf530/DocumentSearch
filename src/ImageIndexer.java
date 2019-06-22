@@ -38,6 +38,10 @@ public class ImageIndexer {
     private IndexWriter indexWriter;
     private double averageLength=1.0f;
     private long docnum;
+    private long pdfnum;
+    private long htmlnum;
+    private long docxnum;
+    private double time;
 	private SimpleDateFormat dateFormat;
 	private float average_pagarank;
 	private Map<String, Float> scores;
@@ -53,6 +57,10 @@ public class ImageIndexer {
     		iwc.setSimilarity(new BM25Similarity());
     		indexWriter = new IndexWriter(dir,iwc);
     		docnum = 0;
+    		pdfnum = 0;
+    		docxnum = 0;
+    		htmlnum = 0;
+    		time = 0;
 			dateFormat = new SimpleDateFormat("HH:mm:ss");
 			p = Pattern.compile("(?<=charset=)(.+)(?=\")");
     		// indexWriter.setSimilarity(new SimpleSimilarity());
@@ -144,29 +152,32 @@ public class ImageIndexer {
 				title = title + "——" + head1.text();
 			}
 			doc.select("header").remove();    // delete header
-//			doc.select("nav").remove();       // delete navigate information
-//			doc.select("footer").remove();    // delete footer
+			doc.select("nav").remove();       // delete navigate information
+			doc.select("footer").remove();    // delete footer
 			org.jsoup.nodes.Element body = doc.body();
+			StringBuilder builder = new StringBuilder();
 			int k = 0;
-//			for(org.jsoup.nodes.Element temp : body.children()){
-//				if(temp.hasClass("header") || temp.hasClass("footer")){
-//					continue;
-//				}
-//				builder.append(temp.text() + " ");
+			for(org.jsoup.nodes.Element temp : body.children()){
+				if(temp.hasClass("header") || temp.hasClass("footer")){
+					continue;
+				}
+				builder.append(temp.text() + " ");
 //					System.out.println(k + " " + temp.text());
 //					System.out.println(temp.attributes());
-//					k ++;
-//			}
-			content = body.text();
+				k ++;
+			}
+			content = builder.toString();
 //			System.out.println(title);
 //			System.out.println(content);
             Path temp = Paths.get(filename);
             filename = temp.subpath(4, temp.getNameCount()).toString();
-			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
+//			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
+			addDocument(content, title, url, "html", 1, filename);
+			htmlnum ++;
 		}
 		catch (Exception e){
-			System.out.println(scores.get(url) + " " + url);
-			System.out.println(e.getMessage());
+			System.out.println(getTime() + " " + scores.get(url) + " " + url);
+			System.out.println(getTime() + " " + e.getMessage());
 		}
 	}
 
@@ -210,10 +221,11 @@ public class ImageIndexer {
 				content = all.substring(breakpoint + 1);
 			}
 			title = delCharSymbol(title);
-			content = delCharSymbol(content);
+//			content = delCharSymbol(content);
             Path temp = Paths.get(filename);
             filename = temp.subpath(4, temp.getNameCount()).toString();
 			addDocument(content, title, url, "pdf", 1.0f, filename);
+			pdfnum++;
 //			System.out.println(title);
 //			System.out.println(content);
 //			System.out.println(url);
@@ -273,10 +285,11 @@ public class ImageIndexer {
 				content = all.substring(breakpoint + 1);
 			}
 			title = delCharSymbol(title);
-			content = delCharSymbol(content);
+//			content = delCharSymbol(content);
             Path temp = Paths.get(filename);
             filename = temp.subpath(4, temp.getNameCount()).toString();
 			addDocument(content, title, url, "docx", 1.0f, filename);
+			docxnum ++;
 //			System.out.println(title);
 //			System.out.println(content);
 //			System.out.println(url);
@@ -311,11 +324,11 @@ public class ImageIndexer {
 		document.add(pathField);
 		indexWriter.addDocument(document);
 		averageLength += content.length();
-		indexWriter.commit();
-		docnum++;
-		if(docnum % 500 == 0){
-			System.out.println(getTime() + " Handle " + docnum + " files!");
+//		indexWriter.commit();
+		if(docnum % 2000 == 0){
+			System.out.println(getTime() + " Handle " + docnum + " files! HTML: " + htmlnum + "  PDF: " + pdfnum + "  DOCX: " + docxnum);
 		}
+		docnum++;
 	}
 
 	private void readFile(String filename, String url){
@@ -396,15 +409,20 @@ public class ImageIndexer {
 				readFile(filename + "/" + dataFiles[i].getName(), dataFiles[i].getName());
 			}
 			long endTime = new Date().getTime();
-			System.out.println(getTime() + " It takes " + (endTime - startTime) / 1000
-					+ " seconds to create index for "+ docnum + " files in directory "
-					+ dataDir.getCanonicalPath());
+			time += (double)(endTime - startTime) / 1000;
+			System.out.println(getTime() + " It takes " + time
+					+ " seconds to create index for "+ docnum + " files " + "HTML: " + htmlnum + "  PDF: " +
+					pdfnum + "  DOCX: " + docxnum);
 			averageLength = averageLength / docnum;
 		}
 		catch (Exception e){
 			e.printStackTrace();
 		}
+	}
 
+	private void writeOver() throws IOException{
+		indexWriter.commit();
+		indexWriter.close();
 	}
 
 	static {
@@ -416,13 +434,13 @@ public class ImageIndexer {
 		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
 		indexer.loadPageRank("forIndex/pagerank.txt");
 		try {
-			File rootdir = new File("/Users/huangyf/Dataset/SearchEngine/test");
+			File rootdir = new File("/Users/huangyf/Dataset/SearchEngine/Big");
 			File[] files = rootdir.listFiles();
 			for (File temp : files) {
 				indexer.indexFromDir(temp.getCanonicalPath());
 			}
 			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
-			indexer.indexWriter.close();
+			indexer.writeOver();
 		}
 		catch (IOException e){
 			e.printStackTrace();
@@ -431,6 +449,12 @@ public class ImageIndexer {
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/(JOB)application_form.doc","");
 //		indexer.indexdocxFile("/Users/gengwei/Desktop/校园搜索引擎（python）/1.docx","");
 //		indexer.indexPdfFile("/Users/gengwei/Desktop/校园搜索引擎（python）/cjjzgd.pdf","");
-//		indexer.indexHtmlFile("input/shimin.htm", "");
+//		long startTime = new Date().getTime();
+//		for(int i = 0; i < 1000; i++) {
+//			indexer.indexHtmlFile("/Users/huangyf/Desktop/大三春季学期/搜索引擎技术基础/Homework/3BigHomework/ImageSearch/input/shimin.htm", "");
+//		}
+//		long endTime = new Date().getTime();
+//		System.out.println(" It takes " + (endTime - startTime) / 1000
+//				+ " seconds");
 	}
 }

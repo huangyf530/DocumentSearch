@@ -8,13 +8,14 @@ String imagePath = request.getScheme()+"://"+request.getServerName()+":"+request
 String currentQuery=(String) request.getAttribute("currentQuery");
 String currentType = (String) request.getAttribute("currentType");
 int currentPage=(Integer) request.getAttribute("currentPage");
+int resultnum = (Integer) request.getAttribute("num");
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title><%=currentQuery + " Page" + currentPage%>></title>
+<title><%=currentQuery + " Page" + currentPage%></title>
 <style type="text/css">
 
 #Layer1 {
@@ -209,6 +210,8 @@ a.m:visited{color: #606}
   	String[] contents = (String[]) request.getAttribute("contents");
   	String[] paths = (String[]) request.getAttribute("paths");
   	String[] base = (String[]) request.getAttribute("base");
+  	int showpagenum = Math.min(currentPage + 5, Math.floorDiv(resultnum + 9, 10));
+  	System.out.println("title length: " + resultnum + "   page to show: " + showpagenum);
   	if(titles!=null && titles.length>0){
 		for(int i = 0; i < 10 && i< titles.length; i++){%>
 		<div>
@@ -226,7 +229,7 @@ a.m:visited{color: #606}
 			<a href="<%="https://" + base[i]%>" class="c-showurl"><%=base[i] + "/"%></a>
 			<span>
 				 -
-				<a href="<%="/" + paths[i]%>" class="m">快照</a>
+				<a href="<%="/" + paths[i]%>" class="m">威哥快照</a>
 			</span>
 	    </div>
 		<%}; %>
@@ -245,10 +248,15 @@ a.m:visited{color: #606}
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
 		<strong><%=currentPage%></strong>
-		<%for (int i=currentPage + 1;i<=currentPage + 5;i++){ %>
+		<%for (int i=currentPage + 1;i<=showpagenum;i++){ %>
 			<a href="ImageServer?query=<%=currentQuery%>&page=<%=i%>"><%=i%></a>
 		<%}; %>
-		<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage + 1%>">下一页</a>
+		<%if (showpagenum != Math.floorDiv(resultnum + 9, 10)){ %>
+			<a href="ImageServer?query=<%=currentQuery%>&page=<%=currentPage + 1%>">下一页</a>
+		<%};%>
+		<%if (showpagenum == Math.floorDiv(resultnum + 9, 10)){%>
+			<a style="text-decoration: underline; text-decoration: grey">下一页</a>
+		<%};%>
 	</p>
   </div>
 </div>
@@ -258,5 +266,5 @@ a.m:visited{color: #606}
 <div>
 </div>
 
-<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. & GengW. All Rights Reserved.</div>
 </body>

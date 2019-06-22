@@ -139,7 +139,7 @@ System.out.println(basePath);
   </form>
 </div>
 
-<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
+<div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. & GengW. All Rights Reserved.</div>
 
 
 

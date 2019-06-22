@@ -66,6 +66,7 @@ public class ImageServer extends HttpServlet{
 		String queryString=request.getParameter("query");
 		String pageString=request.getParameter("page");
 		String typeString = request.getParameter("type");
+		int num = 0;
 		int page = 1;
 		if(typeString == null){
 			typeString = "all";
@@ -86,6 +87,7 @@ public class ImageServer extends HttpServlet{
 		TopDocs results;
 		results = search.searchQuery(queryString, "title", "content", typeString, 100, contents);
 		if (results != null) {
+			num = results.scoreDocs.length;
 			ScoreDoc[] hits = showList(results.scoreDocs, page);
 			if (hits != null) {
 				for (int i = 0; i < hits.length && i < PAGE_RESULT; i++) {
@@ -113,6 +115,7 @@ public class ImageServer extends HttpServlet{
 		request.setAttribute("contents", contents);
 		request.setAttribute("paths", paths);
 		request.setAttribute("base", base);
+		request.setAttribute("num", num);
 		request.getRequestDispatcher("/imageshow.jsp").forward(request,
 				response);
 	}

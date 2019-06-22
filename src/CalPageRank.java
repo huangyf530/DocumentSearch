@@ -119,7 +119,7 @@ public class CalPageRank {
         PageRank<String, DefaultEdge> pageRank = new PageRank<>(graph, dampingfactor);
         long endTime = new Date().getTime();
         System.out.println(getTime() + " It takes " + (endTime - startTime) / 1000
-                + " seconds to calculate pagerank for " + websites.size() + " urls");
+                + " seconds to calculate pagerank for " + websites.size() + " urls and " + graph.edgeSet().size() + " edges");
         score = pageRank.getScores();
     }
 
@@ -151,7 +151,7 @@ public class CalPageRank {
         CalPageRank calPageRank = new CalPageRank();
 //        calPageRank.indexHtmlFile("input/test.html", "h", "h");
         try {
-            File datadir = new File("/Users/huangyf/Dataset/SearchEngine/test");
+            File datadir = new File("/Users/huangyf/Dataset/SearchEngine/Big");
             File[] dataFiles = datadir.listFiles();
             for(File file : dataFiles){
                 System.out.println("From " + file.getCanonicalPath());
