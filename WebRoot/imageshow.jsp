@@ -15,7 +15,10 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><%=currentQuery + " Page" + currentPage%>></title>
-<style type="text/css">
+
+	<link rel="stylesheet" href="/speech-input.css">
+
+	<style type="text/css">
 
 #Layer1 {
 	position:absolute;
@@ -42,7 +45,7 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 	z-index:3;
 }
 
-.searchbox{
+.speech-input{
 	height: 30px;
 	width: 460px;
 	font-size:17px;
@@ -160,7 +163,7 @@ a.m:visited{color: #606}
 
   <form id="form1" name="form1" method="get" action="ImageServer">
     <label>
-      <input name="query" value="<%=currentQuery%>" type="text" size="70" class = "searchbox"/>
+      <input name="query" value="<%=currentQuery%>" type="text" class = "speech-input" autocomplete="off"/>
     </label>
     <label>
     <input type="submit" name="Submit" value="搜索" class = "searchbutton" />
@@ -259,4 +262,10 @@ a.m:visited{color: #606}
 </div>
 
 <div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
+
+
+
 </body>
+<script src="/speech-input.js"></script>
+
+</html>

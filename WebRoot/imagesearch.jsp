@@ -26,7 +26,7 @@ System.out.println(basePath);
   .wrapper{
     position: fixed;
     left: 50%;
-    top: 30%;
+    top: 40%;
     width: 500px;
     height: 250px;
     margin-left: -250px;
@@ -49,7 +49,7 @@ System.out.println(basePath);
   .title{
     position: fixed;
     left: 50%;
-    top: 10%;
+    top: 18%;
 
     width: 300px;
 
@@ -58,11 +58,11 @@ System.out.println(basePath);
     z-index: 1;
   }
 
-  .searchbox{
+  .speech-input{
     height: 30px;
     width: 460px;
     font-size:17px;
-    margin-top: 220px;
+    margin-top: 0px;
     background-image: url(pic/sousuo.png);
     background-repeat: no-repeat;
     background-size: 25px;
@@ -104,7 +104,7 @@ System.out.println(basePath);
   .hyfpic{
     position: absolute;
     margin-left: 100px;
-    margin-top: 0px;
+    margin-top: 30px;
     width: 300px;
     height: 200px;
     z-index: -1;
@@ -121,15 +121,15 @@ System.out.println(basePath);
 
 <body style="text-align:center">
 
+
+
 <div id="Layer1" class="wrapper">
 
-  <div id="Layer0" class="hyfpic">
-    <img src="/pic/logo.jpg" style="height: 200px; width: 300px;"/>
-  </div>
+
 
   <form id="form1" name="form1" method="get" action="servlet/ImageServer">
     <label>
-      <input name="query" type="text" class="speech-input" placeholder="请输入要查询的关键字"/>
+      <input name="query" type="text" class="speech-input" autocomplete="off" placeholder="请输入要查询的关键字"/>
     </label>
     <br/>
     <br/>
@@ -137,6 +137,11 @@ System.out.println(basePath);
     <input type="submit" name="Submit" class="searchbutton" value="搜索" />
     </label>
   </form>
+
+  <div id="Layer0" class="hyfpic">
+    <img src="/pic/logo.jpg" style="height: 200px; width: 300px;"/>
+  </div>
+
 </div>
 
 <div id = "CopyRight" class="copyright">Copyright © 2019 Huangyf. All Rights Reserved.</div>
