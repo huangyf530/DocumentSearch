@@ -6,6 +6,7 @@ String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 String imagePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+"/";
 String currentQuery=(String) request.getAttribute("currentQuery");
+String currentType = (String) request.getAttribute("currentType");
 int currentPage=(Integer) request.getAttribute("currentPage");
 %>
 
@@ -23,7 +24,6 @@ int currentPage=(Integer) request.getAttribute("currentPage");
 	width:1500px;
 	height:50px;
 	z-index:1;
-
 }
 #Layer2 {
 	position:absolute;
@@ -95,6 +95,52 @@ input:focus{
 	font-size: 13px;
 	text-align:center;
 }
+
+
+.s_tab {
+
+	line-height:30px;
+	padding:0 0 0;
+
+
+	display: block;
+	-webkit-box-sizing:border-box;
+	box-sizing:border-box;
+
+	width:700px;
+
+	background:#f8f8f8;
+
+/*
+	border: 3px solid #F03D33;
+	*/
+}
+
+#S_tab a{
+	width:54px;
+	display:inline-block;
+	text-decoration:none;
+	text-align:center;
+	color:#666;
+	font-size:14px;
+}
+
+#S_tab b{
+
+	width:54px;
+	display:inline-block;
+	text-decoration:none;
+	text-align:center;
+	font-size:14px;
+
+	border-bottom:2px solid #F03D33;
+	font-weight:700;
+	color:#323232;
+}
+	#S_tab a:hover{
+		color:#323232;
+	}
+
 </style>
 </head>
 
@@ -112,7 +158,39 @@ input:focus{
   </form>
 </div>
 <div id="Layer2" style="top: 82px; height: 585px;">
-  <div id="imagediv">结果显示如下：
+
+	<div id="S_tab" class="s_tab">
+		<%if(currentType == "all") {%>
+		<b>全部</b>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
+		<%} else if(currentType == "html"){%>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
+		<b>HTML</b>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
+		<%} else if(currentType == "pdf"){%>
+
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
+		<b>PDF</b>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=doc">DOC</a>
+
+		<%} else if(currentType == "doc"){%>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=all">全部</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=html">HTML</a>
+		<a href="ImageServer?query=<%=currentQuery%>&page=1&type=pdf">PDF</a>
+		<b>DOC</b>
+
+		<%};%>
+
+	</div>
+
+	<br/>
+
+
+	<div id="imagediv">结果显示如下：
   <br>
   <Table style="left: 0px; width: 600px;">
   <% 
