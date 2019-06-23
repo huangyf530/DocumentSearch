@@ -171,8 +171,8 @@ public class ImageIndexer {
 //			System.out.println(content);
             Path temp = Paths.get(filename);
             filename = temp.subpath(4, temp.getNameCount()).toString();
-//			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
-			addDocument(content, title, url, "html", 1, filename);
+			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
+//			addDocument(content, title, url, "html", 1, filename);
 			htmlnum ++;
 		}
 		catch (Exception e){
@@ -431,7 +431,7 @@ public class ImageIndexer {
 	}
 
 	public static void main(String[] args) {
-		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
+		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2/index");
 		indexer.loadPageRank("forIndex/pagerank.txt");
 		try {
 			File rootdir = new File("/Users/huangyf/Dataset/SearchEngine/Big");
@@ -439,7 +439,7 @@ public class ImageIndexer {
 			for (File temp : files) {
 				indexer.indexFromDir(temp.getCanonicalPath());
 			}
-			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
+			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2/global.txt");
 			indexer.writeOver();
 		}
 		catch (IOException e){

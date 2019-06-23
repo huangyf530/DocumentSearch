@@ -23,7 +23,7 @@ import java.io.*;
 
 public class ImageServer extends HttpServlet{
 	public static final int PAGE_RESULT = 10;
-	public static final String indexDir = "forIndex";
+	public static final String indexDir = "forIndex2";
 	public static final String picDir = "";
 
 	String[] titles = null;

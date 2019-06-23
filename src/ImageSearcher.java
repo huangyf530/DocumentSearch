@@ -60,8 +60,8 @@ public class ImageSearcher {
 				Term term2 = new Term(field2, tmpString);
 				Query query1 = new TermQuery(term1);
 				Query query2 = new FuzzyQuery(term2, 1);
-				finalQueryBuilder.add(new BoostQuery(query1, 10.0f), BooleanClause.Occur.SHOULD);
-				finalQueryBuilder.add(new BoostQuery(query2, 1f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query1, 8.0f), BooleanClause.Occur.SHOULD);
+				finalQueryBuilder.add(new BoostQuery(query2, 0.7f), BooleanClause.Occur.SHOULD);
 			}
 			System.out.println();
 			tokenStream.close();
@@ -82,7 +82,7 @@ public class ImageSearcher {
 			Query pagerank = FeatureField.newSaturationQuery("features", "pagerank");
 			finalQuery = new BooleanQuery.Builder()
 					.add(finalQuery, BooleanClause.Occur.MUST)
-					.add(new BoostQuery(pagerank, 10f), BooleanClause.Occur.SHOULD)
+					.add(new BoostQuery(pagerank, 20f), BooleanClause.Occur.SHOULD)
 					.build();
 			TopDocs results = searcher.search(finalQuery, maxnum);
 			if(results != null) {
@@ -152,7 +152,7 @@ public class ImageSearcher {
 	}
 	
 	public static void main(String[] args){
-		ImageSearcher search=new ImageSearcher("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/index");
+		ImageSearcher search=new ImageSearcher("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2/index");
 //		search.loadGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex/global.txt");
 		System.out.println("avg length = "+search.getAvg());
 		String[] contents = new String[100];
