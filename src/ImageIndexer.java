@@ -42,6 +42,7 @@ public class ImageIndexer {
     private long htmlnum;
     private long docxnum;
     private double time;
+    private int rootlength;
 	private SimpleDateFormat dateFormat;
 	private float average_pagarank;
 	private Map<String, Float> scores;
@@ -170,7 +171,7 @@ public class ImageIndexer {
 //			System.out.println(title);
 //			System.out.println(content);
             Path temp = Paths.get(filename);
-            filename = temp.subpath(4, temp.getNameCount()).toString();
+            filename = temp.subpath(rootlength, temp.getNameCount()).toString();
 			addDocument(content, title, url, "html", scores.get(url) / average_pagarank, filename);
 //			addDocument(content, title, url, "html", 1, filename);
 			htmlnum ++;
@@ -223,7 +224,7 @@ public class ImageIndexer {
 			title = delCharSymbol(title);
 //			content = delCharSymbol(content);
             Path temp = Paths.get(filename);
-            filename = temp.subpath(4, temp.getNameCount()).toString();
+            filename = temp.subpath(rootlength, temp.getNameCount()).toString();
 			addDocument(content, title, url, "pdf", 1.0f, filename);
 			pdfnum++;
 //			System.out.println(title);
@@ -287,7 +288,7 @@ public class ImageIndexer {
 			title = delCharSymbol(title);
 //			content = delCharSymbol(content);
             Path temp = Paths.get(filename);
-            filename = temp.subpath(4, temp.getNameCount()).toString();
+            filename = temp.subpath(rootlength, temp.getNameCount()).toString();
 			addDocument(content, title, url, "docx", 1.0f, filename);
 			docxnum ++;
 //			System.out.println(title);
@@ -403,6 +404,7 @@ public class ImageIndexer {
 				System.out.println("ERROR: " + filename + "is empty!");
 				return;
 			}
+			rootlength = Paths.get(dataDir.getCanonicalPath()).getNameCount() - 2;
 			long startTime = new Date().getTime();
 			System.out.println(getTime() + ": begin create index from directory " + dataDir.getCanonicalPath());
 			for (int i = 0; i < dataFiles.length; i++) {
@@ -431,15 +433,18 @@ public class ImageIndexer {
 	}
 
 	public static void main(String[] args) {
-		ImageIndexer indexer=new ImageIndexer("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2/index");
-		indexer.loadPageRank("forIndex/pagerank.txt");
+		String indexpath = "/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2";
+		String datapath = "/Users/huangyf/Dataset/SearchEngine/Big";
+		String pagerankpath = "forIndex/pagerank.txt";
+		ImageIndexer indexer=new ImageIndexer(indexpath + "/index");
+		indexer.loadPageRank(pagerankpath);
 		try {
-			File rootdir = new File("/Users/huangyf/Dataset/SearchEngine/Big");
+			File rootdir = new File(datapath);
 			File[] files = rootdir.listFiles();
 			for (File temp : files) {
 				indexer.indexFromDir(temp.getCanonicalPath());
 			}
-			indexer.saveGlobals("/Users/huangyf/Dataset/SearchEngine/apache-tomcat-9.0.21/bin/forIndex2/global.txt");
+			indexer.saveGlobals(indexpath + "/global.txt");
 			indexer.writeOver();
 		}
 		catch (IOException e){
